@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.SpatialMapping;
+using HoloToolkit.Sharing;
 
 namespace HoloToolkit.Unity.InputModule
 {
@@ -169,19 +170,22 @@ namespace HoloToolkit.Unity.InputModule
 
         private void AttachWorldAnchor()
         {
-            if (WorldAnchorManager.Instance != null)
+            if (SharingWorldAnchorManager.Instance != null)
             {
                 // Add world anchor when object placement is done.
-                WorldAnchorManager.Instance.AttachAnchor(PlaceParentOnTap ? ParentGameObjectToPlace : gameObject);
+              //  WorldAnchorManager.Instance.AttachAnchor(PlaceParentOnTap ? ParentGameObjectToPlace : gameObject);
+                SharingWorldAnchorManager.Instance.AttachAnchor(PlaceParentOnTap ? ParentGameObjectToPlace : gameObject);
+               // SharingWorldAnchorManager.Instance.
             }
         }
 
         private void RemoveWorldAnchor()
         {
-            if (WorldAnchorManager.Instance != null)
+            if (SharingWorldAnchorManager.Instance != null)
             {
                 //Removes existing world anchor if any exist.
-                WorldAnchorManager.Instance.RemoveAnchor(PlaceParentOnTap ? ParentGameObjectToPlace : gameObject);
+             //   WorldAnchorManager.Instance.RemoveAnchor(PlaceParentOnTap ? ParentGameObjectToPlace : gameObject);
+                SharingWorldAnchorManager.Instance.RemoveAnchor(PlaceParentOnTap ? ParentGameObjectToPlace : gameObject);
             }
         }
 
