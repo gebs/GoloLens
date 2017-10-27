@@ -396,7 +396,12 @@ namespace HoloToolkit.Sharing
 
             if (setConnection)
             {
-                config.SetServerAddress(ServerAddress);
+                //Emulator
+                //config.SetServerAddress("172.16.80.1");
+                //NonEmulator
+                config.SetServerAddress("192.168.43.22");
+
+                //config.SetServerAddress(ServerAddress);
                 config.SetServerPort(ServerPort);
             }
 
