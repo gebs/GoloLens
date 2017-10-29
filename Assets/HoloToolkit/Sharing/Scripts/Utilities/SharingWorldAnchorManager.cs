@@ -31,6 +31,9 @@ namespace HoloToolkit.Sharing
         /// </summary>
         public event Action<bool, GameObject> AnchorDownloaded;
 
+        public event EventHandler Test;
+
+
         /// <summary>
         /// Sometimes we'll see a really small anchor blob get generated.
         /// These tend to not work, so we have a minimum trustworthy size.
@@ -642,11 +645,8 @@ namespace HoloToolkit.Sharing
                     AnchorDebugText.text += "\nImport failed!";
                 }
             }
-
             if (AnchorDownloaded != null)
-            {
                 AnchorDownloaded(successful, objectToAnchor);
-            }
 
             anchorBatch.Dispose();
             rawAnchorDownloadData = null;

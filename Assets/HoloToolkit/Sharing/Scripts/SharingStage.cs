@@ -393,13 +393,14 @@ namespace HoloToolkit.Sharing
             var config = new ClientConfig(ClientRole);
             config.SetIsAudioEndpoint(IsAudioEndpoint);
             config.SetLogWriter(logWriter);
-
+             
             if (setConnection)
             {
                 //Emulator
-                //config.SetServerAddress("172.16.80.1");
+               // config.SetServerAddress("172.16.80.1");
                 //NonEmulator
-                config.SetServerAddress("192.168.43.22");
+                //config.SetServerAddress("192.168.43.22");
+                config.SetServerAddress("192.168.1.104");
 
                 //config.SetServerAddress(ServerAddress);
                 config.SetServerPort(ServerPort);

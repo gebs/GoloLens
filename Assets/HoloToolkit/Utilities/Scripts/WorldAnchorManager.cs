@@ -39,6 +39,8 @@ namespace HoloToolkit.Unity
         [Tooltip("Enables anchors to be stored from subsequent game sessions.")]
         public bool PersistentAnchors;
 
+        public event Action<bool, GameObject> BaseAnchorDownloaded;
+
 #if UNITY_WSA
         /// <summary>
         /// To prevent initializing too many anchors at once
