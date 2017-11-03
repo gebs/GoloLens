@@ -8,5 +8,6 @@ public enum GameStates
     GameStart,
     PlacingBoard,
     WaitingForPlacingBoard,
+    None
 
 }

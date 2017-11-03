@@ -168,7 +168,7 @@ namespace HoloToolkit.Sharing
         /// <param name="e">Events Arguments.</param>
         private void Connected(object sender = null, EventArgs e = null)
         {
-            SharingStage.Instance.SharingManagerConnected -= Connected;
+            SharingStage.Instance.SharingManagerConnected -= Connected; 
             SharingStage.Instance.SharingManagerDisconnected += Disconnected;
 
             SharingStage.Instance.RoomManagerAdapter.UserJoinedRoomEvent += RoomManagerListener_OnRoomJoined;

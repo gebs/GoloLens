@@ -3,6 +3,7 @@ using HoloToolkit.Sharing.Spawning;
 using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Unity.SpatialMapping;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +18,11 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     public TextMesh UserInfoText;
 
     public GameObject BoardPerfab;
+    public GameObject SynchronizedParent;
     public PrefabSpawnManager BoardSpawnManager;
+    public int DebugTextMaxLines;
+
+
 
     private GameStates gameState;
     private GameObject boardobject;
@@ -25,10 +30,13 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     bool isPlacingObject = false;
     bool isWaitingForPlacement = false;
     bool isBoardCreated = false;
+    bool canPlaceBoard = false;
     // Use this for initialization
     void Start()
     {
         this.gameState = GameStates.BeforeGameStarts;
+        if (DebugTextMaxLines == 0)
+            DebugTextMaxLines = 20;
     }
 
     // Update is called once per frame
@@ -44,7 +52,6 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 {
                     isCheckingifBoardNeedsPlacing = true;
                     WriteUserInfoText("Looking for Servers, please Wait");
-
                 }
                 else
                 {
@@ -58,8 +65,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                     CreateGameObject();
                     ToggleSpatialMesh();
                     InputManager.Instance.PushModalInputHandler(gameObject);
+                    canPlaceBoard = true;
                 }
-                else
+                else if (canPlaceBoard)
                 {
                     PlaceObject();
                 }
@@ -67,7 +75,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.WaitingForPlacingBoard:
                 if (!isWaitingForPlacement)
                 {
-
+                    isWaitingForPlacement = true;
                     ((SharingWorldAnchorManager)SharingWorldAnchorManager.Instance).AnchorDownloaded += GameStatesManager_AnchorDownloaded;
                 }
                 break;
@@ -81,14 +89,12 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     {
         if (sucessfull)
         {
-
+            //Instantiate<GameObject>(objectToPlace, objectToPlace.transform.position, objectToPlace.transform.rotation);
         }
     }
 
     private void CheckIfBoardNeedsPlacing()
     {
-        //WriteDebugText("CheckIfBoardNeedsPlacing");
-
         if (SharingStage.Instance.IsConnected)
         {
             WriteUserInfoText("Connected to Server");
@@ -135,10 +141,6 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
     }
 
-    private void AnchorDownloaded(bool test, GameObject gameObject)
-    {
-
-    }
 
     /// <summary>
     /// If we're using the spatial mapping, check to see if we got a hit, else use the gaze position.
@@ -207,7 +209,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         WriteDebugText(text);
         if (null == UserInfoText)
             return;
-        UserInfoText.text = "\r\n" + text;
+        UserInfoText.text = "\n" + text;
     }
 
     private void WriteDebugText(string text)
@@ -215,7 +217,20 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         if (null == DebugText)
             return;
 
-        DebugText.text += "\r\n" + text;
+        string debugText = DebugText.text;
+        string[] debugTextLines = debugText.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+        if (debugTextLines.Length >= DebugTextMaxLines)
+        {
+            debugText = "";
+            for (int i = 1; i <debugTextLines.Length;i++)
+            {
+                debugText += debugTextLines[i];
+            }
+        }
+
+        debugText += "\n" + text;
+        DebugText.text = debugText;
 
     }
 
@@ -226,11 +241,12 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.PlacingBoard:
                 isPlacingObject = false;
                 ToggleSpatialMesh();
-                SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
-                SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
-                syncSpawnedObject.GameObject = BoardPerfab;
-                BoardSpawnManager.Spawn(syncSpawnedObject, boardobject.transform.localPosition, boardobject.transform.localRotation, null, "GameBoard", true);
-                gameState = GameStates.WaitingForPlacingBoard;
+               // SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
+             //   SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
+              //  syncSpawnedObject.GameObject = BoardPerfab;
+                var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
+                BoardSpawnManager.Spawn(new SyncGameBoard(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "DummyBoard", true);
+                gameState = GameStates.None;
                 break;
             case GameStates.WaitingForPlacingBoard:
                 break;
