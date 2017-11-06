@@ -245,7 +245,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
              //   SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
               //  syncSpawnedObject.GameObject = BoardPerfab;
                 var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
-                BoardSpawnManager.Spawn(new SyncGameBoard(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "DummyBoard", true);
+                BoardSpawnManager.Spawn(new SyncSpawnedObject(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "DummyBoard", true);
                 gameState = GameStates.None;
                 break;
             case GameStates.WaitingForPlacingBoard:
@@ -255,3 +255,4 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
     }
 }
+ 
