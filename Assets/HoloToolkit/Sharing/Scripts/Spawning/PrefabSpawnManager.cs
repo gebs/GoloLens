@@ -34,6 +34,8 @@ namespace HoloToolkit.Sharing.Spawning
         [SerializeField]
         private List<PrefabToDataModel> spawnablePrefabs = null;
 
+        public event EventHandler<GameObjectSpawnedEventArgs> GameObjectSpawned;
+
         private Dictionary<string, GameObject> typeToPrefab;
 
         /// <summary>
@@ -243,7 +245,16 @@ namespace HoloToolkit.Sharing.Spawning
             TransformSynchronizer transformSynchronizer = instance.EnsureComponent<TransformSynchronizer>();
             transformSynchronizer.TransformDataModel = dataModel.Transform;
 
+            if (GameObjectSpawned != null)
+            {
+                GameObjectSpawned(this, new GameObjectSpawnedEventArgs() { SpawnedObject = instance });
+            }
+
             return instance;
         }
+    }
+    public class GameObjectSpawnedEventArgs : EventArgs
+    {
+        public GameObject SpawnedObject { get; set; }
     }
 }

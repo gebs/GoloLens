@@ -574,6 +574,8 @@ MonoBehaviour:
   UserInfoText: {fileID: 0}
   BoardPerfab: {fileID: 100000, guid: 6a46cb4f3598ead4ea954579265ff370, type: 3}
   SynchronizedParent: {fileID: 984105224}
+  WhiteStonePerfab: {fileID: 0}
+  BlackStonePerfab: {fileID: 0}
   BoardSpawnManager: {fileID: 1681967977}
   DebugTextMaxLines: 0
 --- !u!114 &1681967977

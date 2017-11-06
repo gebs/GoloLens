@@ -19,11 +19,13 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
     public GameObject BoardPerfab;
     public GameObject SynchronizedParent;
+    public GameObject WhiteStonePerfab;
+    public GameObject BlackStonePerfab;
     public PrefabSpawnManager BoardSpawnManager;
     public int DebugTextMaxLines;
 
 
-
+    private StoneColor myStoneColor;
     private GameStates gameState;
     private GameObject boardobject;
     bool isCheckingifBoardNeedsPlacing = false;
@@ -87,9 +89,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
     private void GameStatesManager_AnchorDownloaded(bool sucessfull, GameObject objectToPlace)
     {
-        if (sucessfull)
+        if (sucessfull && objectToPlace.name == "DummyBoard")
         {
-            //Instantiate<GameObject>(objectToPlace, objectToPlace.transform.position, objectToPlace.transform.rotation);
+            Instantiate<GameObject>(objectToPlace, objectToPlace.transform.position, objectToPlace.transform.rotation);
         }
     }
 
@@ -103,10 +105,12 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             {
                 if (SharingStage.Instance.CurrentRoom.GetUserCount() == 1)
                 {
+                    myStoneColor = StoneColor.White;
                     gameState = GameStates.PlacingBoard;
                 }
                 else
                 {
+                    myStoneColor = StoneColor.Black;
                     WriteUserInfoText("The other player is placing the object, please wait.");
                     gameState = GameStates.WaitingForPlacingBoard;
                 }
@@ -127,6 +131,34 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             boardobject.AddComponent<Interpolator>();
             boardobject.AddComponent<BoxCollider>();
         }
+    }
+    /// <summary>
+    /// Sets the neccessary Scripts on all Zylinder of the Board
+    /// </summary>
+    /// <param name="gameObject">GameBoard with Zylinders as Children</param>
+    private void SetZylinderScripts(GameObject gameObject)
+    {
+        foreach (var item in gameObject.GetComponents<Transform>())
+        {
+            item.gameObject.AddComponent<GameZylinder>();
+        }
+    }
+    /// <summary>
+    /// Places a new Stone object ontop of a Zylinder
+    /// </summary>
+    /// <param name="zylinder">Zylinder to place to stone upon</param>
+    public void SetStone(GameObject zylinder)
+    {
+        GameObject stoneperfab = myStoneColor == StoneColor.Black ? BlackStonePerfab : WhiteStonePerfab;
+        int offset = 20;
+
+        var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
+        stone.SetActive(true);
+
+
+
+        zylinder.GetComponent<GameZylinder>().Stone = stone;
+
     }
 
     private void PlaceObject()
@@ -223,7 +255,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         if (debugTextLines.Length >= DebugTextMaxLines)
         {
             debugText = "";
-            for (int i = 1; i <debugTextLines.Length;i++)
+            for (int i = 1; i < debugTextLines.Length; i++)
             {
                 debugText += debugTextLines[i];
             }
@@ -241,9 +273,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.PlacingBoard:
                 isPlacingObject = false;
                 ToggleSpatialMesh();
-               // SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
-             //   SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
-              //  syncSpawnedObject.GameObject = BoardPerfab;
+                //SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
+                //   SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
+                //  syncSpawnedObject.GameObject = BoardPerfab;
                 var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
                 BoardSpawnManager.Spawn(new SyncSpawnedObject(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "DummyBoard", true);
                 gameState = GameStates.None;
@@ -255,4 +287,3 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
     }
 }
- 
