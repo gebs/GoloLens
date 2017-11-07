@@ -572,7 +572,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugText: {fileID: 2015381343}
   UserInfoText: {fileID: 0}
-  BoardPerfab: {fileID: 100000, guid: 6a46cb4f3598ead4ea954579265ff370, type: 3}
+  BoardPerfab: {fileID: 100164, guid: 7b987761d071e154690783367f2f6e4e, type: 3}
   SynchronizedParent: {fileID: 984105224}
   WhiteStonePerfab: {fileID: 0}
   BlackStonePerfab: {fileID: 0}
