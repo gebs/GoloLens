@@ -121,6 +121,10 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
 
     }
+    private void SetBla()
+    {
+        BoardSpawnManager
+    }
     private void CreateGameObject()
     {
         WriteDebugText("CreateGameObject");
@@ -133,6 +137,31 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             boardobject.AddComponent<Interpolator>();
             boardobject.AddComponent<BoxCollider>();
         }
+    }
+    /// <summary>
+    /// Sets the neccessary Scripts on all Zylinder of the Board
+    /// </summary>
+    /// <param name="gameObject">GameBoard with Zylinders as Children</param>
+    private void SetZylinderScripts(GameObject gameObject)
+    {
+        foreach (var item in gameObject.GetComponents<Transform>())
+        {
+            item.gameObject.AddComponent<GameZylinder>();
+            item.gameObject.GetComponent<GameZylinder>().Position = new ZylinderPosition() { Row = Convert.ToInt32(item.gameObject.name[0]), Column = Convert.ToInt32(item.gameObject.name[1]) };
+        }
+    }
+    /// <summary>
+    /// Places a new Stone object ontop of a Zylinder
+    /// </summary>
+    /// <param name="zylinder">Zylinder to place to stone upon</param>
+    public void SetStone(GameObject zylinder)
+    {
+        GameObject stoneperfab = myStoneColor == StoneColor.Black ? BlackStonePerfab : WhiteStonePerfab;
+        int offset = 20;
+
+        var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
+        stone.SetActive(true);
+        zylinder.GetComponent<GameZylinder>().Stone = stone;
     }
 
     private void PlaceObject()
@@ -183,6 +212,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         spatialMapHit = new RaycastHit();
         return false;
     }
+
     /// <summary>
     /// Get placement position either from GazeManager hit or infront of the user as backup
     /// </summary>
