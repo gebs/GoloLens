@@ -32,13 +32,17 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     private bool canPlaceBoard = false;
     private bool isPlaying = false;
     private StoneColor myStoneColor;
+    private GameObject focusedObject;
     // Use this for initialization
     void Start()
     {
         this.gameState = GameStates.BeforeGameStarts;
+        BoardSpawnManager.GameObjectSpawned += BoardSpawnManager_GameObjectSpawned;
         if (DebugTextMaxLines == 0)
             DebugTextMaxLines = 20;
     }
+
+
 
     // Update is called once per frame
     void Update()
@@ -83,7 +87,10 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 break;
             case GameStates.Playing:
                 if (isPlaying)
+                {
+                    UpdateFocusedObject();
                     break;
+                }
 
                 WriteUserInfoText("Yay, you're playing now!");
                 this.isPlaying = true;
@@ -93,7 +100,17 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
 
     }
+    private void BoardSpawnManager_GameObjectSpawned(object sender, GameObjectSpawnedEventArgs e)
+    {
+        if (e.SpawnedObject.name.Contains("Board"))
+        {
+            if (e.isLocal)
+                SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
 
+            boardobject = e.SpawnedObject;
+            SetZylinderScripts(boardobject);
+        }
+    }
     private void GameStatesManager_AnchorDownloaded(bool sucessful, GameObject objectToPlace)
     {
         if (sucessful)
@@ -126,7 +143,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     }
     private void SetBla()
     {
-        
+
     }
     private void CreateGameObject()
     {
@@ -147,10 +164,16 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     /// <param name="gameObject">GameBoard with Zylinders as Children</param>
     private void SetZylinderScripts(GameObject gameObject)
     {
-        foreach (var item in gameObject.GetComponents<Transform>())
+        foreach (var item in gameObject.GetComponentsInChildren<Transform>())
         {
-            item.gameObject.AddComponent<GameZylinder>();
-            item.gameObject.GetComponent<GameZylinder>().Position = new ZylinderPosition() { Row = Convert.ToInt32(item.gameObject.name[0]), Column = Convert.ToInt32(item.gameObject.name[1]) };
+            if (!item.name.Contains("Board") && !item.name.Contains("Cube") && !item.name.ToLower().Contains("line"))
+            {
+
+                item.gameObject.AddComponent<BoxCollider>();
+                item.gameObject.AddComponent<GameZylinder>();
+                item.gameObject.GetComponent<GameZylinder>().Position = new ZylinderPosition() { Row = Convert.ToInt32(item.gameObject.name[0]), Column = Convert.ToInt32(item.gameObject.name[1]) };
+                item.name = "Zylinder_" + item.name;
+            }
         }
     }
     /// <summary>
@@ -160,13 +183,26 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     public void SetStone(GameObject zylinder)
     {
         GameObject stoneperfab = myStoneColor == StoneColor.Black ? BlackStonePerfab : WhiteStonePerfab;
-        int offset = 20;
-
+        float offset = 0.01f;
         var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
         stone.SetActive(true);
         zylinder.GetComponent<GameZylinder>().Stone = stone;
     }
-
+    public void UpdateFocusedObject()
+    {
+        GameObject oldfocusedObject = focusedObject;
+        Transform cameraTransform = CameraCache.Main.transform;
+        int layer = 1 << LayerMask.NameToLayer(boardobject.name);
+        RaycastHit hitInfo;
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hitInfo))
+        {
+            focusedObject = hitInfo.collider.gameObject;
+        }
+        else
+        {
+            focusedObject = null;
+        }
+    }
     private void PlaceObject()
     {
         Transform cameraTransform = CameraCache.Main.transform;
@@ -176,7 +212,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         boardobject.GetComponent<Interpolator>().SetTargetPosition(placementPosition);
         // Rotate this object to face the user.
         boardobject.GetComponent<Interpolator>().SetTargetRotation(Quaternion.Euler(0, cameraTransform.localEulerAngles.y, 0));
-     
+
     }
 
 
@@ -280,14 +316,18 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.PlacingBoard:
                 isPlacingObject = false;
                 ToggleSpatialMesh();
+                Destroy(boardobject);
                 // SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
                 //   SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
                 //  syncSpawnedObject.GameObject = BoardPerfab;
                 var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
-                BoardSpawnManager.Spawn(new SyncSpawnedObject(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "DummyBoard", true);
+                BoardSpawnManager.Spawn(new SyncSpawnedObject(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "GameBoard", true);
                 gameState = GameStates.Playing;
                 break;
             case GameStates.WaitingForPlacingBoard:
+                break;
+            case GameStates.Playing:
+                SetStone(focusedObject);
                 break;
             default:
                 break;

@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 1115926575}
   - component: {fileID: 1115926574}
   - component: {fileID: 1115926573}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -369,7 +369,7 @@ BoxCollider:
   m_GameObject: {fileID: 1115926571}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -572,9 +572,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugText: {fileID: 2015381343}
   UserInfoText: {fileID: 0}
-  BoardPrefab: {fileID: 100164, guid: 7b987761d071e154690783367f2f6e4e, type: 3}
+  BoardPrefab: {fileID: 100162, guid: e64155eaece7cca44b79ff2b6e255eab, type: 3}
   SynchronizedParent: {fileID: 984105224}
   BoardSpawnManager: {fileID: 1681967977}
+  BlackStonePerfab: {fileID: 100000, guid: 2f589201a08ce6d43bd445096a57c8d0, type: 3}
+  WhiteStonePerfab: {fileID: 100000, guid: 2f589201a08ce6d43bd445096a57c8d0, type: 3}
   DebugTextMaxLines: 0
 --- !u!114 &1681967977
 MonoBehaviour:
@@ -589,7 +591,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnablePrefabs:
   - DataModelClassName: SyncSpawnedObject
-    Prefab: {fileID: 100000, guid: 6a46cb4f3598ead4ea954579265ff370, type: 3}
+    Prefab: {fileID: 100162, guid: e64155eaece7cca44b79ff2b6e255eab, type: 3}
 --- !u!1 &2015381341
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,7 +603,7 @@ GameObject:
   - component: {fileID: 2015381344}
   - component: {fileID: 2015381343}
   - component: {fileID: 2015381345}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: DebugText
   m_TagString: Untagged
   m_Icon: {fileID: 0}

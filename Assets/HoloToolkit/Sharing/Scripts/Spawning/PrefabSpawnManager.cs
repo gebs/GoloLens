@@ -247,7 +247,13 @@ namespace HoloToolkit.Sharing.Spawning
 
             if (GameObjectSpawned != null)
             {
-                GameObjectSpawned(this, new GameObjectSpawnedEventArgs() { SpawnedObject = instance });
+                GameObjectSpawned(this, new GameObjectSpawnedEventArgs()
+                {
+                    SpawnedObject = instance
+                    ,
+                    isLocal = dataModel.Owner != null ? (dataModel.Owner == SharingStage.Instance.Manager.GetLocalUser()) : false
+                });
+
             }
 
             return instance;
@@ -256,5 +262,6 @@ namespace HoloToolkit.Sharing.Spawning
     public class GameObjectSpawnedEventArgs : EventArgs
     {
         public GameObject SpawnedObject { get; set; }
+        public bool isLocal { get; set; }
     }
 }
