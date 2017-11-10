@@ -572,10 +572,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DebugText: {fileID: 2015381343}
   UserInfoText: {fileID: 0}
-  BoardPerfab: {fileID: 100164, guid: 7b987761d071e154690783367f2f6e4e, type: 3}
+  BoardPrefab: {fileID: 100164, guid: 7b987761d071e154690783367f2f6e4e, type: 3}
   SynchronizedParent: {fileID: 984105224}
-  WhiteStonePerfab: {fileID: 0}
-  BlackStonePerfab: {fileID: 0}
   BoardSpawnManager: {fileID: 1681967977}
   DebugTextMaxLines: 0
 --- !u!114 &1681967977
