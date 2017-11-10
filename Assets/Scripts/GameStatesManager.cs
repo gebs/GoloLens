@@ -18,6 +18,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     public GameObject BoardPrefab;
     public GameObject SynchronizedParent;
     public PrefabSpawnManager BoardSpawnManager;
+    public GameObject BlackStonePerfab;
+    public GameObject WhiteStonePerfab;
     public int DebugTextMaxLines;
 
 
@@ -29,6 +31,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     private bool isBoardCreated = false;
     private bool canPlaceBoard = false;
     private bool isPlaying = false;
+    private StoneColor myStoneColor;
     // Use this for initialization
     void Start()
     {
@@ -123,7 +126,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     }
     private void SetBla()
     {
-        BoardSpawnManager
+        
     }
     private void CreateGameObject()
     {
