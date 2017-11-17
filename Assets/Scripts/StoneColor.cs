@@ -4,6 +4,6 @@ using UnityEngine;
 
 public enum StoneColor  {
     White,
-    Black,
+    Red,
     None
 }

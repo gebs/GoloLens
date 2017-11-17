@@ -18,7 +18,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     public GameObject BoardPrefab;
     public GameObject SynchronizedParent;
     public PrefabSpawnManager BoardSpawnManager;
-    public GameObject RedStonePerfab;
+    public GameObject RedStonePrefab;
     public GameObject WhiteStonePrefab;
     public int DebugTextMaxLines;
 
@@ -141,10 +141,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
 
     }
-    private void SetBla()
-    {
-
-    }
+ 
     private void CreateGameObject()
     {
         WriteDebugText("CreateGameObject");
@@ -182,7 +179,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     /// <param name="zylinder">Zylinder to place to stone upon</param>
     public void SetStone(GameObject zylinder)
     {
-        GameObject stoneperfab = myStoneColor == StoneColor.Black ? RedStonePerfab : WhiteStonePrefab;
+        GameObject stoneperfab = myStoneColor == StoneColor.Red ? RedStonePrefab : WhiteStonePrefab;
         float offset = 0.01f;
         var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
         stone.SetActive(true);
@@ -306,7 +303,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
         debugText += "\n" + text;
         DebugText.text = debugText;
-
+        
     }
 
     public void OnInputClicked(InputClickedEventData eventData)
