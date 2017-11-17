@@ -575,8 +575,8 @@ MonoBehaviour:
   BoardPrefab: {fileID: 100162, guid: e64155eaece7cca44b79ff2b6e255eab, type: 3}
   SynchronizedParent: {fileID: 984105224}
   BoardSpawnManager: {fileID: 1681967977}
-  BlackStonePerfab: {fileID: 100000, guid: 2f589201a08ce6d43bd445096a57c8d0, type: 3}
-  WhiteStonePerfab: {fileID: 100000, guid: 2f589201a08ce6d43bd445096a57c8d0, type: 3}
+  BlackStonePerfab: {fileID: 100000, guid: edcb74e8c28356d40b1d29721e76c119, type: 3}
+  WhiteStonePerfab: {fileID: 100000, guid: 5332bc59c1778684783a2024b3c02bb5, type: 3}
   DebugTextMaxLines: 0
 --- !u!114 &1681967977
 MonoBehaviour:

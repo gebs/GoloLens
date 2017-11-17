@@ -18,8 +18,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     public GameObject BoardPrefab;
     public GameObject SynchronizedParent;
     public PrefabSpawnManager BoardSpawnManager;
-    public GameObject BlackStonePerfab;
-    public GameObject WhiteStonePerfab;
+    public GameObject RedStonePerfab;
+    public GameObject WhiteStonePrefab;
     public int DebugTextMaxLines;
 
 
@@ -182,7 +182,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     /// <param name="zylinder">Zylinder to place to stone upon</param>
     public void SetStone(GameObject zylinder)
     {
-        GameObject stoneperfab = myStoneColor == StoneColor.Black ? BlackStonePerfab : WhiteStonePerfab;
+        GameObject stoneperfab = myStoneColor == StoneColor.Black ? RedStonePerfab : WhiteStonePrefab;
         float offset = 0.01f;
         var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
         stone.SetActive(true);
