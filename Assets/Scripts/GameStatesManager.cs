@@ -4,6 +4,7 @@ using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Unity.SpatialMapping;
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class GameStatesManager : MonoBehaviour, IInputClickHandler
@@ -91,7 +92,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                     UpdateFocusedObject();
                     break;
                 }
-
+                Destroy(SpatialMappingManager.Instance);
                 WriteUserInfoText("Yay, you're playing now!");
                 this.isPlaying = true;
                 break;
@@ -110,6 +111,25 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             boardobject = e.SpawnedObject;
             SetZylinderScripts(boardobject);
         }
+        else if (e.SpawnedObject.name.Contains("spielstein"))
+        {
+            GameObject zylinder = FindZylinderByPosition(e.SpawnedObject.transform.position - new Vector3(0, 0.01f, 0));
+
+            if (zylinder != null)
+            {
+                if (zylinder.GetComponent<GameZylinder>().HasStoneSet())
+                {
+                    Destroy(zylinder.GetComponent<GameZylinder>().Stone);
+                    zylinder.GetComponent<GameZylinder>().Stone = null;
+                    zylinder.GetComponent<GameZylinder>().StoneColor = StoneColor.None;
+                }
+                else
+                {
+                    zylinder.GetComponent<GameZylinder>().Stone = e.SpawnedObject;
+                    zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor : (StoneColor.Red); //TODO: find Other Stone Color!
+                }
+            }
+        }
     }
     private void GameStatesManager_AnchorDownloaded(bool sucessful, GameObject objectToPlace)
     {
@@ -117,6 +137,18 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         {
             //Instantiate<GameObject>(objectToPlace, objectToPlace.transform.position, objectToPlace.transform.rotation);
         }
+    }
+
+    private GameObject FindZylinderByPosition(Vector3 position)
+    {
+        //Collider[] colliders;
+        var collidedGameObjects =
+                Physics.OverlapSphere(position, 0.01f /*Radius*/)
+                .Where(x => x.name.ToLower().Contains("zylinder"))
+                .Select(c => c.gameObject)
+                .ToArray();
+
+        return collidedGameObjects.First();
     }
 
     private void CheckIfBoardNeedsPlacing()
@@ -317,8 +349,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 // SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
                 //   SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
                 //  syncSpawnedObject.GameObject = BoardPerfab;
-                var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
-                BoardSpawnManager.Spawn(new SyncSpawnedObject(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "GameBoard", true);
+                // var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
+                BoardSpawnManager.Spawn(new SyncSpawnedObject(), boardobject.transform.localPosition, boardobject.transform.localRotation, SynchronizedParent, "GameBoard", true);
                 gameState = GameStates.Playing;
                 break;
             case GameStates.WaitingForPlacingBoard:
