@@ -224,6 +224,8 @@
     <Compile Include="Assets\HoloToolkit\Sharing\Scripts\Spawning\SpawnManager.cs" />
     <Compile Include="Assets\HoloToolkit\Sharing\Scripts\Spawning\SyncSpawnArray.cs" />
     <Compile Include="Assets\HoloToolkit\Sharing\Scripts\Spawning\SyncSpawnedObject.cs" />
+    <Compile Include="Assets\HoloToolkit\Sharing\Scripts\Spawning\SyncSpawnedSpielstein.cs" />
+    <Compile Include="Assets\HoloToolkit\Sharing\Scripts\Spawning\SyncSpawnedSpielsteinRot.cs" />
     <Compile Include="Assets\HoloToolkit\Sharing\Scripts\SyncModel\SyncArray.cs" />
     <Compile Include="Assets\HoloToolkit\Sharing\Scripts\SyncModel\SyncBool.cs" />
     <Compile Include="Assets\HoloToolkit\Sharing\Scripts\SyncModel\SyncDataAttributes.cs" />

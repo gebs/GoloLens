@@ -5,6 +5,7 @@ using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Unity.SpatialMapping;
 using System;
 using System.Linq;
+using Assets.HoloToolkit.Sharing.Scripts.Spawning;
 using UnityEngine;
 
 public class GameStatesManager : MonoBehaviour, IInputClickHandler
@@ -211,11 +212,13 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     /// <param name="zylinder">Zylinder to place to stone upon</param>
     public void SetStone(GameObject zylinder)
     {
-        GameObject stoneperfab = myStoneColor == StoneColor.Red ? RedStonePrefab : WhiteStonePrefab;
+        GameObject stonePrefab = myStoneColor == StoneColor.Red ? RedStonePrefab : WhiteStonePrefab;
         float offset = 0.01f;
-        var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
-        stone.SetActive(true);
-        zylinder.GetComponent<GameZylinder>().Stone = stone;
+        //var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
+        //stone.SetActive(true);
+        //zylinder.GetComponent<GameZylinder>().Stone = stone;
+        BoardSpawnManager.Spawn(new SyncSpawnedSpielstein(stonePrefab), zylinder.transform.position + new Vector3(0, offset, 0), zylinder.transform.localRotation, boardobject, "Spielstein", true);
+        
     }
     public void UpdateFocusedObject()
     {

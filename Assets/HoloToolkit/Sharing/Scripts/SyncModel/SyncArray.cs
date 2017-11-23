@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.HoloToolkit.Sharing.Scripts.Spawning;
 using UnityEngine;
 
 namespace HoloToolkit.Sharing.SyncModel
@@ -84,6 +85,8 @@ namespace HoloToolkit.Sharing.SyncModel
             // Create our object element for our target
             string id = System.Guid.NewGuid().ToString();
             string dataModelName = SyncSettings.Instance.GetDataModelName(newSyncObject.GetType());
+            if (dataModelName == null)
+                dataModelName = "SyncSpawnedSpielstein";
             ObjectElement existingElement = Element.CreateObjectElement(new XString(id), dataModelName, owner);
 
             // Create a new object and assign the element

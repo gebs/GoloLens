@@ -5,7 +5,6 @@ using UnityEngine;
 using System;
 
 #if UNITY_WSA
-using System;
 using System.Collections.Generic;
 using UnityEngine.VR.WSA;
 using UnityEngine.VR.WSA.Persistence;

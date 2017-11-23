@@ -511,6 +511,10 @@ MonoBehaviour:
   spawnablePrefabs:
   - DataModelClassName: SyncSpawnedObject
     Prefab: {fileID: 100162, guid: e64155eaece7cca44b79ff2b6e255eab, type: 3}
+  - DataModelClassName: SyncSpawnedSpielstein
+    Prefab: {fileID: 100000, guid: edcb74e8c28356d40b1d29721e76c119, type: 3}
+  - DataModelClassName: SyncSpawnedSpielstein
+    Prefab: {fileID: 100000, guid: 5332bc59c1778684783a2024b3c02bb5, type: 3}
 --- !u!1001 &2109570343
 Prefab:
   m_ObjectHideFlags: 0
