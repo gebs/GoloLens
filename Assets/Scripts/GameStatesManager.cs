@@ -38,9 +38,11 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     void Start()
     {
         this.gameState = GameStates.BeforeGameStarts;
-        this.myStoneColor = StoneColor.Red;
+        // this.myStoneColor = StoneColor.Red;
         BoardSpawnManager.GameObjectSpawned += BoardSpawnManager_GameObjectSpawned;
-        
+        //HACK: Change for Turnbased playing
+        //TurnManager.Instance.IsMyTurn = true;
+
         if (DebugTextMaxLines == 0)
             DebugTextMaxLines = 20;
     }
@@ -59,6 +61,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 if (!isCheckingifBoardNeedsPlacing)
                 {
                     isCheckingifBoardNeedsPlacing = true;
+                    InputManager.Instance.PushModalInputHandler(gameObject);
                     WriteUserInfoText("Looking for Servers, please Wait");
                 }
                 else
@@ -69,7 +72,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.PlacingBoard:
                 if (!isPlacingObject)
                 {
-                    myStoneColor = StoneColor.White;
+
                     TurnManager.Instance.ChangeCurrentTurn();
                     isPlacingObject = true;
                     CreateGameObject();
@@ -85,7 +88,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.WaitingForPlacingBoard:
                 if (!isWaitingForPlacement)
                 {
-                    myStoneColor = StoneColor.Red;
+
                     isWaitingForPlacement = true;
                     ((SharingWorldAnchorManager)SharingWorldAnchorManager.Instance).AnchorDownloaded +=
                         GameStatesManager_AnchorDownloaded;
@@ -97,7 +100,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                     UpdateFocusedObject();
                     break;
                 }
-                Destroy(SpatialMappingManager.Instance);
+                SpatialMappingManager.Instance.enabled = false;
+                Destroy(SpatialMappingManager.Instance.gameObject);
                 WriteUserInfoText("Yay, you're playing now!");
                 this.isPlaying = true;
                 break;
@@ -110,11 +114,20 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     {
         if (e.SpawnedObject.GameObject.name.Contains("Board"))
         {
+
             if (e.isLocal)
+            {
+                myStoneColor = StoneColor.White;
                 SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
+            }
+            else
+            {
+                myStoneColor = StoneColor.Red;
+            }
 
             boardobject = e.SpawnedObject.GameObject;
             SetZylinderScripts(boardobject);
+            gameState = GameStates.Playing;
         }
         else if (e.SpawnedObject.GameObject.name.Contains("Spielstein") && (e.isLocal && TurnManager.Instance.IsMyTurn || !e.isLocal && !TurnManager.Instance.IsMyTurn))
         {
@@ -131,9 +144,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 }
                 else
                 {
-                  //  TurnManager.Instance.ChangeCurrentTurn();
+                    TurnManager.Instance.ChangeCurrentTurn();
                     zylinder.GetComponent<GameZylinder>().Stone = e.SpawnedObject;
-                    zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor : (StoneColor.Red); //TODO: find Other Stone Color!
+                    zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor :(myStoneColor == StoneColor.Red ? StoneColor.White : StoneColor.Red); 
                 }
             }
         }
@@ -168,10 +181,12 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             {
                 if (SharingStage.Instance.CurrentRoom.GetUserCount() == 1)
                 {
+                    
                     gameState = GameStates.PlacingBoard;
                 }
                 else
                 {
+                    
                     WriteUserInfoText("The other player is placing the object, please wait.");
                     gameState = GameStates.WaitingForPlacingBoard;
                 }
@@ -367,7 +382,6 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 //  syncSpawnedObject.GameObject = BoardPerfab;
                 // var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
                 BoardSpawnManager.Spawn(new SyncSpawnedObject(), boardobject.transform.localPosition, boardobject.transform.localRotation, SynchronizedParent, "GameBoard", true);
-                gameState = GameStates.Playing;
                 break;
             case GameStates.WaitingForPlacingBoard:
                 break;

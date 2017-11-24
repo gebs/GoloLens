@@ -68,7 +68,7 @@ namespace HoloToolkit.Sharing
             {
                 return CurrentRoomManager != null && CurrentRoomManager.GetCurrentRoom() != null
                     ? CurrentRoomManager.GetCurrentRoom().GetName().GetString()
-                    : defaultRoomName;
+                    : GetDefaultRoomName();
             }
         }
 
@@ -393,14 +393,14 @@ namespace HoloToolkit.Sharing
             var config = new ClientConfig(ClientRole);
             config.SetIsAudioEndpoint(IsAudioEndpoint);
             config.SetLogWriter(logWriter);
-             
+
             if (setConnection)
             {
                 //Emulator
-               // config.SetServerAddress("172.16.80.1");
+                // config.SetServerAddress("172.16.80.1");
                 //NonEmulator
-               // config.SetServerAddress("192.168.43.22");
-                config.SetServerAddress("10.155.101.108");
+                config.SetServerAddress("192.168.43.22");
+                //  config.SetServerAddress("10.155.101.108");
 
                 //config.SetServerAddress(ServerAddress);
                 config.SetServerPort(ServerPort);
@@ -490,6 +490,15 @@ namespace HoloToolkit.Sharing
         {
             SessionsTracker.LeaveCurrentSession();
             Manager.SetServerConnectionInfo(ServerAddress, (uint)ServerPort);
+        }
+
+        public string GetDefaultRoomName()
+        {
+            return RoundUp(DateTime.Now, TimeSpan.FromMinutes(5)).ToString("HH:MM");
+        }
+        DateTime RoundUp(DateTime dt, TimeSpan d)
+        {
+            return new DateTime(((dt.Ticks + d.Ticks - 1) / d.Ticks) * d.Ticks);
         }
     }
 }
