@@ -355,6 +355,7 @@
     <Compile Include="Assets\Scripts\GameZylinder.cs" />
     <Compile Include="Assets\Scripts\StoneColor.cs" />
     <Compile Include="Assets\Scripts\SyncGameBoard.cs" />
+    <Compile Include="Assets\Scripts\TurnManager.cs" />
     <Compile Include="Assets\Scripts\ZylinderPosition.cs" />
   </ItemGroup>
   <ItemGroup>

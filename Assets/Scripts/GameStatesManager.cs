@@ -38,7 +38,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     void Start()
     {
         this.gameState = GameStates.BeforeGameStarts;
+        this.myStoneColor = StoneColor.Red;
         BoardSpawnManager.GameObjectSpawned += BoardSpawnManager_GameObjectSpawned;
+        
         if (DebugTextMaxLines == 0)
             DebugTextMaxLines = 20;
     }
@@ -67,6 +69,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.PlacingBoard:
                 if (!isPlacingObject)
                 {
+                    myStoneColor = StoneColor.White;
+                    TurnManager.Instance.ChangeCurrentTurn();
                     isPlacingObject = true;
                     CreateGameObject();
                     ToggleSpatialMesh();
@@ -81,6 +85,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.WaitingForPlacingBoard:
                 if (!isWaitingForPlacement)
                 {
+                    myStoneColor = StoneColor.Red;
                     isWaitingForPlacement = true;
                     ((SharingWorldAnchorManager)SharingWorldAnchorManager.Instance).AnchorDownloaded +=
                         GameStatesManager_AnchorDownloaded;
@@ -103,28 +108,30 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     }
     private void BoardSpawnManager_GameObjectSpawned(object sender, GameObjectSpawnedEventArgs e)
     {
-        if (e.SpawnedObject.name.Contains("Board"))
+        if (e.SpawnedObject.GameObject.name.Contains("Board"))
         {
             if (e.isLocal)
                 SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
 
-            boardobject = e.SpawnedObject;
+            boardobject = e.SpawnedObject.GameObject;
             SetZylinderScripts(boardobject);
         }
-        else if (e.SpawnedObject.name.Contains("spielstein"))
+        else if (e.SpawnedObject.GameObject.name.Contains("Spielstein") && (e.isLocal && TurnManager.Instance.IsMyTurn || !e.isLocal && !TurnManager.Instance.IsMyTurn))
         {
-            GameObject zylinder = FindZylinderByPosition(e.SpawnedObject.transform.position - new Vector3(0, 0.01f, 0));
+            GameObject zylinder = FindZylinderByPosition(e.SpawnedObject.GameObject.transform.position - new Vector3(0, 0.01f, 0));
 
             if (zylinder != null)
             {
                 if (zylinder.GetComponent<GameZylinder>().HasStoneSet())
                 {
-                    Destroy(zylinder.GetComponent<GameZylinder>().Stone);
+                    BoardSpawnManager.Delete(e.SpawnedObject);
+                    BoardSpawnManager.Delete(zylinder.GetComponent<GameZylinder>().Stone);
                     zylinder.GetComponent<GameZylinder>().Stone = null;
                     zylinder.GetComponent<GameZylinder>().StoneColor = StoneColor.None;
                 }
                 else
                 {
+                  //  TurnManager.Instance.ChangeCurrentTurn();
                     zylinder.GetComponent<GameZylinder>().Stone = e.SpawnedObject;
                     zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor : (StoneColor.Red); //TODO: find Other Stone Color!
                 }
@@ -173,7 +180,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
 
     }
- 
+
     private void CreateGameObject()
     {
         WriteDebugText("CreateGameObject");
@@ -205,6 +212,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             }
         }
     }
+
     /// <summary>
     /// Places a new Stone object ontop of a Zylinder
     /// </summary>
@@ -213,10 +221,18 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     {
         GameObject stoneperfab = myStoneColor == StoneColor.Red ? RedStonePrefab : WhiteStonePrefab;
         float offset = 0.01f;
-        var stone = Instantiate(stoneperfab, zylinder.transform.position + new Vector3(0, offset, 0), Quaternion.identity);
-        stone.SetActive(true);
-        zylinder.GetComponent<GameZylinder>().Stone = stone;
+        SyncSpawnedObject syncSpawnedObject = null;
+        //syncSpawnedObject.GameObject = 
+        if (myStoneColor == StoneColor.Red)
+            syncSpawnedObject = new SyncStoneRed();
+        else
+            syncSpawnedObject = new SyncStoneWhite();
+
+        var newBoardPosition = boardobject.transform.InverseTransformPoint(zylinder.transform.position + new Vector3(0, offset, 0));
+        BoardSpawnManager.Spawn(syncSpawnedObject, newBoardPosition, zylinder.transform.rotation, boardobject, "Spielstein", true);
+        //zylinder.GetComponent<GameZylinder>().Stone = stone;
     }
+
     public void UpdateFocusedObject()
     {
         GameObject oldfocusedObject = focusedObject;
@@ -335,7 +351,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
         debugText += "\n" + text;
         DebugText.text = debugText;
-        
+
     }
 
     public void OnInputClicked(InputClickedEventData eventData)
@@ -356,7 +372,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.WaitingForPlacingBoard:
                 break;
             case GameStates.Playing:
-                SetStone(focusedObject);
+                if (TurnManager.Instance.IsMyTurn)
+                    SetStone(focusedObject);
                 break;
             default:
                 break;

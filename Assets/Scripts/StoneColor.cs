@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum StoneColor  {
-    White,
-    Red,
-    None
+    White = 1,
+    Red = 2,
+    None = 0
 }

@@ -244,14 +244,15 @@ namespace HoloToolkit.Sharing.Spawning
             // Setup the transform synchronization
             TransformSynchronizer transformSynchronizer = instance.EnsureComponent<TransformSynchronizer>();
             transformSynchronizer.TransformDataModel = dataModel.Transform;
-
+            var test = SharingStage.Instance.Manager.GetLocalUser();
+            var tmp =dataModel.Owner.GetHashCode() == SharingStage.Instance.Manager.GetLocalUser().GetHashCode();
             if (GameObjectSpawned != null)
             {
                 GameObjectSpawned(this, new GameObjectSpawnedEventArgs()
                 {
-                    SpawnedObject = instance
+                    SpawnedObject = dataModel
                     ,
-                    isLocal = dataModel.Owner != null ? (dataModel.Owner == SharingStage.Instance.Manager.GetLocalUser()) : false
+                    isLocal = dataModel.Owner != null ? (dataModel.Owner.GetID() == SharingStage.Instance.Manager.GetLocalUser().GetID()) : false
                 });
 
             }
@@ -261,7 +262,7 @@ namespace HoloToolkit.Sharing.Spawning
     }
     public class GameObjectSpawnedEventArgs : EventArgs
     {
-        public GameObject SpawnedObject { get; set; }
+        public SyncSpawnedObject SpawnedObject { get; set; }
         public bool isLocal { get; set; }
     }
 }

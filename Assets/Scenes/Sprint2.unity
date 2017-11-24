@@ -428,6 +428,7 @@ GameObject:
   - component: {fileID: 1681967974}
   - component: {fileID: 1681967976}
   - component: {fileID: 1681967977}
+  - component: {fileID: 1681967978}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -511,6 +512,21 @@ MonoBehaviour:
   spawnablePrefabs:
   - DataModelClassName: SyncSpawnedObject
     Prefab: {fileID: 100162, guid: e64155eaece7cca44b79ff2b6e255eab, type: 3}
+  - DataModelClassName: SyncStoneWhite
+    Prefab: {fileID: 100000, guid: 5332bc59c1778684783a2024b3c02bb5, type: 3}
+  - DataModelClassName: SyncStoneRed
+    Prefab: {fileID: 100000, guid: edcb74e8c28356d40b1d29721e76c119, type: 3}
+--- !u!114 &1681967978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1681967972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ad2172754bbf774fb3110137a463fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2109570343
 Prefab:
   m_ObjectHideFlags: 0
