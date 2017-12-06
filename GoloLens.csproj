@@ -353,6 +353,7 @@
     <Compile Include="Assets\Scripts\GameStates.cs" />
     <Compile Include="Assets\Scripts\GameStatesManager.cs" />
     <Compile Include="Assets\Scripts\GameZylinder.cs" />
+    <Compile Include="Assets\Scripts\GoloLensPerfabSpawnManager.cs" />
     <Compile Include="Assets\Scripts\StoneColor.cs" />
     <Compile Include="Assets\Scripts\SyncGameBoard.cs" />
     <Compile Include="Assets\Scripts\TurnManager.cs" />

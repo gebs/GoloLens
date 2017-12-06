@@ -34,7 +34,7 @@ namespace HoloToolkit.Sharing.Spawning
         [SerializeField]
         private List<PrefabToDataModel> spawnablePrefabs = null;
 
-        public event EventHandler<GameObjectSpawnedEventArgs> GameObjectSpawned;
+        
 
         private Dictionary<string, GameObject> typeToPrefab;
 
@@ -244,25 +244,11 @@ namespace HoloToolkit.Sharing.Spawning
             // Setup the transform synchronization
             TransformSynchronizer transformSynchronizer = instance.EnsureComponent<TransformSynchronizer>();
             transformSynchronizer.TransformDataModel = dataModel.Transform;
-            var test = SharingStage.Instance.Manager.GetLocalUser();
-            var tmp =dataModel.Owner.GetHashCode() == SharingStage.Instance.Manager.GetLocalUser().GetHashCode();
-            if (GameObjectSpawned != null)
-            {
-                GameObjectSpawned(this, new GameObjectSpawnedEventArgs()
-                {
-                    SpawnedObject = dataModel
-                    ,
-                    isLocal = dataModel.Owner != null ? (dataModel.Owner.GetID() == SharingStage.Instance.Manager.GetLocalUser().GetID()) : false
-                });
 
-            }
+            
 
             return instance;
         }
     }
-    public class GameObjectSpawnedEventArgs : EventArgs
-    {
-        public SyncSpawnedObject SpawnedObject { get; set; }
-        public bool isLocal { get; set; }
-    }
+
 }

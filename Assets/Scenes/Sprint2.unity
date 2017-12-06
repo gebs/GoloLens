@@ -427,8 +427,8 @@ GameObject:
   - component: {fileID: 1681967975}
   - component: {fileID: 1681967974}
   - component: {fileID: 1681967976}
-  - component: {fileID: 1681967977}
   - component: {fileID: 1681967978}
+  - component: {fileID: 1681967977}
   m_Layer: 2
   m_Name: Managers
   m_TagString: Untagged
@@ -506,7 +506,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1681967972}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50ea9b56756ce4549ac9331b03af784f, type: 3}
+  m_Script: {fileID: 11500000, guid: 79918d484dc1d92478203bb8bc90387b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   spawnablePrefabs:

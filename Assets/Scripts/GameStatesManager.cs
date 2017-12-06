@@ -18,7 +18,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
     public GameObject BoardPrefab;
     public GameObject SynchronizedParent;
-    public PrefabSpawnManager BoardSpawnManager;
+    public GoloLensPerfabSpawnManager BoardSpawnManager;
     public GameObject RedStonePrefab;
     public GameObject WhiteStonePrefab;
     public int DebugTextMaxLines;
@@ -41,7 +41,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         // this.myStoneColor = StoneColor.Red;
         BoardSpawnManager.GameObjectSpawned += BoardSpawnManager_GameObjectSpawned;
         //HACK: Change for Turnbased playing
-        //TurnManager.Instance.IsMyTurn = true;
+        TurnManager.Instance.IsMyTurn = true;
 
         if (DebugTextMaxLines == 0)
             DebugTextMaxLines = 20;
@@ -73,7 +73,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 if (!isPlacingObject)
                 {
 
-                    TurnManager.Instance.ChangeCurrentTurn();
+                  //  TurnManager.Instance.ChangeCurrentTurn();
                     isPlacingObject = true;
                     CreateGameObject();
                     ToggleSpatialMesh();
@@ -144,7 +144,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 }
                 else
                 {
-                    TurnManager.Instance.ChangeCurrentTurn();
+                 //   TurnManager.Instance.ChangeCurrentTurn();
                     zylinder.GetComponent<GameZylinder>().Stone = e.SpawnedObject;
                     zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor :(myStoneColor == StoneColor.Red ? StoneColor.White : StoneColor.Red); 
                 }
