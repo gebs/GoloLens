@@ -5,6 +5,7 @@ using UnityEngine;
 public enum GameStates
 {
     BeforeGameStarts,
+    AnchorSharing,
     GameStart,
     PlacingBoard,
     WaitingForPlacingBoard,

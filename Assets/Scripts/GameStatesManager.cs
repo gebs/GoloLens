@@ -32,6 +32,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     private bool isBoardCreated = false;
     private bool canPlaceBoard = false;
     private bool isPlaying = false;
+    private bool anchorDownloaded = false;
+    private bool isplayer1 = false;
     private StoneColor myStoneColor;
     private GameObject focusedObject;
     // Use this for initialization
@@ -55,6 +57,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         switch (gameState)
         {
             case GameStates.BeforeGameStarts:
+                ((SharingWorldAnchorManager)SharingWorldAnchorManager.Instance).AnchorUploaded += GameStatesManager_AnchorUploaded;
                 gameState = GameStates.GameStart;
                 break;
             case GameStates.GameStart:
@@ -69,11 +72,22 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                     CheckIfBoardNeedsPlacing();
                 }
                 break;
+            case GameStates.AnchorSharing:
+                if (anchorDownloaded)
+                {
+                    if (isplayer1)
+                    {
+                        gameState = GameStates.PlacingBoard;
+                    }
+                    else
+                    {
+                        gameState = GameStates.WaitingForPlacingBoard;
+                    }
+                }
+                break;
             case GameStates.PlacingBoard:
                 if (!isPlacingObject)
                 {
-
-                  //  TurnManager.Instance.ChangeCurrentTurn();
                     isPlacingObject = true;
                     CreateGameObject();
                     ToggleSpatialMesh();
@@ -110,6 +124,13 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
 
     }
+
+    private void GameStatesManager_AnchorUploaded(bool obj)
+    {
+        if (obj)
+            anchorDownloaded = true;
+    }
+
     private void BoardSpawnManager_GameObjectSpawned(object sender, GameObjectSpawnedEventArgs e)
     {
         if (e.SpawnedObject.GameObject.name.Contains("Board"))
@@ -144,9 +165,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 }
                 else
                 {
-                 //   TurnManager.Instance.ChangeCurrentTurn();
+                    //   TurnManager.Instance.ChangeCurrentTurn();
                     zylinder.GetComponent<GameZylinder>().Stone = e.SpawnedObject;
-                    zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor :(myStoneColor == StoneColor.Red ? StoneColor.White : StoneColor.Red); 
+                    zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor : (myStoneColor == StoneColor.Red ? StoneColor.White : StoneColor.Red);
                 }
             }
         }
@@ -155,6 +176,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     {
         if (sucessful)
         {
+            anchorDownloaded = true;
             //Instantiate<GameObject>(objectToPlace, objectToPlace.transform.position, objectToPlace.transform.rotation);
         }
     }
@@ -181,14 +203,14 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             {
                 if (SharingStage.Instance.CurrentRoom.GetUserCount() == 1)
                 {
-                    
-                    gameState = GameStates.PlacingBoard;
+                    isplayer1 = true;
+                    gameState = GameStates.AnchorSharing;
                 }
                 else
                 {
-                    
+
                     WriteUserInfoText("The other player is placing the object, please wait.");
-                    gameState = GameStates.WaitingForPlacingBoard;
+                    gameState = GameStates.AnchorSharing;
                 }
                 isCheckingifBoardNeedsPlacing = false;
             }
