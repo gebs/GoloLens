@@ -398,12 +398,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             case GameStates.PlacingBoard:
                 isPlacingObject = false;
                 ToggleSpatialMesh();
+                var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
+                BoardSpawnManager.Spawn(new SyncSpawnedObject(), newBoardPosition, boardobject.transform.localRotation, SynchronizedParent, "GameBoard", true);
                 Destroy(boardobject);
-                // SharingWorldAnchorManager.Instance.AttachAnchor(boardobject);
-                //   SyncSpawnedObject syncSpawnedObject = new SyncSpawnedObject();
-                //  syncSpawnedObject.GameObject = BoardPerfab;
-                // var newBoardPosition = SynchronizedParent.transform.InverseTransformPoint(boardobject.transform.localPosition);
-                BoardSpawnManager.Spawn(new SyncSpawnedObject(), boardobject.transform.localPosition, boardobject.transform.localRotation, SynchronizedParent, "GameBoard", true);
                 break;
             case GameStates.WaitingForPlacingBoard:
                 break;
