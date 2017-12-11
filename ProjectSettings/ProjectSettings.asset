@@ -625,9 +625,9 @@ PlayerSettings:
     UNet: 1
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
-  cloudProjectId: c6fb4874-86f9-40eb-ac6e-992e3abb6072
-  projectName: GoloLens
-  organizationId: gololens
+  cloudProjectId: 54e8ac13-3214-4802-b431-0034d9caedc1
+  projectName: GoloLens (2)
+  organizationId: carlaiten
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0

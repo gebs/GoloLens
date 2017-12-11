@@ -400,7 +400,7 @@ namespace HoloToolkit.Sharing
                 // config.SetServerAddress("172.16.80.1");
                 //NonEmulator
 
-                config.SetServerAddress("192.168.43.87");
+                config.SetServerAddress("192.168.1.107");
 
 
                 //  

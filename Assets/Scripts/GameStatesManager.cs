@@ -36,6 +36,8 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     private bool isplayer1 = false;
     private StoneColor myStoneColor;
     private GameObject focusedObject;
+   
+
     // Use this for initialization
     void Start()
     {
@@ -47,6 +49,11 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
         if (DebugTextMaxLines == 0)
             DebugTextMaxLines = 20;
+
+        #if UNITY_EDITOR
+            anchorDownloaded = true;
+        #endif
+
     }
 
 
