@@ -7,7 +7,7 @@ public class GameZylinder : MonoBehaviour
 {
     public StoneColor StoneColor { get; set; }
     public ZylinderPosition Position { get; set; }
-    public SyncSpawnedObject Stone { get; set; }
+    public GameObject Stone { get; set; }
 
     public bool HasStoneSet() {
         return Stone != null;

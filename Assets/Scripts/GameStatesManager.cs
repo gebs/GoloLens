@@ -159,14 +159,13 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 if (zylinder.GetComponent<GameZylinder>().HasStoneSet())
                 {
                     BoardSpawnManager.Delete(e.SpawnedObject);
-                    BoardSpawnManager.Delete(zylinder.GetComponent<GameZylinder>().Stone);
+                  
                     zylinder.GetComponent<GameZylinder>().Stone = null;
                     zylinder.GetComponent<GameZylinder>().StoneColor = StoneColor.None;
                 }
                 else
                 {
-                    //   TurnManager.Instance.ChangeCurrentTurn();
-                    zylinder.GetComponent<GameZylinder>().Stone = e.SpawnedObject;
+
                     zylinder.GetComponent<GameZylinder>().StoneColor = e.isLocal ? myStoneColor : (myStoneColor == StoneColor.Red ? StoneColor.White : StoneColor.Red);
                 }
             }
