@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[NetworkSettings(sendInterval = 0.033f)]
 public class BoardController : NetworkBehaviour, IInputClickHandler
 {
 
@@ -19,7 +20,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
 
     [SyncVar] private GameStates2 gameState;
     [SyncVar] private Vector3 syncPos;
-    [SyncVar] private float syncYRot;
+    [SyncVar] private Quaternion syncYRot;
 
     private GameObject focusedObject;
     private Vector3 lastPos;
@@ -39,8 +40,8 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
     // Use this for initialization
     void Start()
     {
-        if (isLocalPlayer)
-            _Instance = this;
+
+        _Instance = this;
         InputManager.Instance.PushModalInputHandler(gameObject);
         transform.SetParent(SharedCollection.Instance.transform, false);
         this.gameObject.AddComponent<Interpolator>();
@@ -53,12 +54,18 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
     {
         if (gameState == GameStates2.PlaceBoard)
         {
-            PlaceObject();
-            TransmitMotion();
-            LerpMotion();
+            if (isServer)
+            {
+                PlaceObject();
+                TransmitMotion();
+            }
+
         }
         else if (gameState == GameStates2.PlayingInit)
         {
+            if (isServer)
+                TransmitMotion();
+
             SpatialMappingManager.Instance.enabled = false;
             Destroy(this.gameObject.GetComponent<BoxCollider>());
             Destroy(SpatialMappingManager.Instance.gameObject);
@@ -70,6 +77,9 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
         }
         else if (gameState == GameStates2.Playing)
         {
+            if (isServer)
+                TransmitMotion();
+
             UpdateFocusedObject();
         }
 
@@ -161,31 +171,14 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
         lastPos = myTransform.position;
         lastRot = myTransform.rotation;
 
-
+        
         //SyncVar変数を変更し、全クライアントと同期を図る
-        syncPos = myTransform.position;
+        syncPos = SharedCollection.Instance.transform.InverseTransformPoint(myTransform.position); 
         //localEulerAngles: Quaternion→オイラー角(360度表記)
-        syncYRot = myTransform.localEulerAngles.y;
+        syncYRot = myTransform.rotation;
 
     }
     //現在のTransform情報とSyncVar情報とを補間する
-    void LerpMotion()
-    {
-        if (isServer)
-        {
-            return;
-        }
-
-        //位置情報の補間
-        myTransform.position = Vector3.Lerp(myTransform.position, syncPos, Time.deltaTime * lerpRate);
-
-        //Y軸のみ変える
-        Vector3 newRot = new Vector3(0, syncYRot, 0);
-
-        //角度の補間
-        //Euler: オイラー角→Quaternion
-        myTransform.rotation = Quaternion.Lerp(myTransform.rotation, Quaternion.Euler(newRot), Time.deltaTime * lerpRate);
-    }
 
     /// <summary>
     /// Sets the neccessary Scripts on all Zylinder of the Board

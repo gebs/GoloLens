@@ -35,14 +35,15 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
                 gameState = GameStates2.BeforeGameStarts;
                 break;
             case GameStates2.BeforeGameStarts:
-                userInfoObject = Instantiate(UserInfoTextPrefab, GetPlacementPosition(CameraCache.Main.transform.position, CameraCache.Main.transform.forward, 2.0f), Quaternion.identity);
-                userInfoObject.GetComponent<TextMesh>().text = "Please wait for the Anchor to be downloaded...";
-                gameState = GameStates2.WaitingForAnchors;
+               // userInfoObject = Instantiate(UserInfoTextPrefab, GetPlacementPosition(CameraCache.Main.transform.position, CameraCache.Main.transform.forward, 2.0f), Quaternion.identity);
+                //userInfoObject.GetComponent<TextMesh>().text = "Please wait for the Anchor to be downloaded...";
                 break;
             case GameStates2.WaitingForAnchorsInit:
+                gameState = GameStates2.WaitingForAnchors;
+               // userInfoObject.SetActive(false);
                 break;
             case GameStates2.WaitingForAnchors:
-                if (UNetAnchorManager.Instance.AnchorEstablished)
+                if (UNetAnchorManager.Instance != null && UNetAnchorManager.Instance.AnchorEstablished)
                 {
                     if (isPlayer1)
                         gameState = GameStates2.PlaceBoardInit;
@@ -56,7 +57,7 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
                 gameState = GameStates2.PlaceBoard;
                 break;
             case GameStates2.WaitingForBoardPlacementInit:
-                userInfoObject.GetComponent<TextMesh>().text = "Please wait until the other user has placed the board...";
+                //userInfoObject.GetComponent<TextMesh>().text = "Please wait until the other user has placed the board...";
                 gameState = GameStates2.WaitingForBoardPlacement;
                 break;
             default:
