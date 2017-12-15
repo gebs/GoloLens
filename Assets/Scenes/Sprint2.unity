@@ -497,6 +497,7 @@ MonoBehaviour:
   BoardSpawnManager: {fileID: 1681967977}
   RedStonePrefab: {fileID: 100000, guid: edcb74e8c28356d40b1d29721e76c119, type: 3}
   WhiteStonePrefab: {fileID: 100000, guid: 5332bc59c1778684783a2024b3c02bb5, type: 3}
+  GiveUpButtonPrefab: {fileID: 100004, guid: 03d50bbee72075640a05bbc79a13563b, type: 3}
   DebugTextMaxLines: 0
 --- !u!114 &1681967977
 MonoBehaviour:

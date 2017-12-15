@@ -43,6 +43,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     {
         this.gameState = GameStates.BeforeGameStarts;
         // this.myStoneColor = StoneColor.Red;
+
         BoardSpawnManager.GameObjectSpawned += BoardSpawnManager_GameObjectSpawned;
         //HACK: Change for Turnbased playing
         TurnManager.Instance.IsMyTurn = true;
@@ -50,9 +51,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         if (DebugTextMaxLines == 0)
             DebugTextMaxLines = 20;
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
             anchorDownloaded = true;
-        #endif
+#endif
 
     }
 
@@ -64,7 +65,9 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         switch (gameState)
         {
             case GameStates.BeforeGameStarts:
+#if !UNITY_EDITOR
                 ((SharingWorldAnchorManager)SharingWorldAnchorManager.Instance).AnchorUploaded += GameStatesManager_AnchorUploaded;
+#endif
                 gameState = GameStates.GameStart;
                 break;
             case GameStates.GameStart:
@@ -111,8 +114,10 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 {
 
                     isWaitingForPlacement = true;
+#if !UNITY_EDITOR
                     ((SharingWorldAnchorManager)SharingWorldAnchorManager.Instance).AnchorDownloaded +=
                         GameStatesManager_AnchorDownloaded;
+#endif
                 }
                 break;
             case GameStates.Playing:
@@ -155,6 +160,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
 
             boardobject = e.SpawnedObject.GameObject;
             SetZylinderScripts(boardobject);
+            SetButtonScripts(boardobject);
             gameState = GameStates.Playing;
         }
         else if (e.SpawnedObject.GameObject.name.Contains("Spielstein") && (e.isLocal && TurnManager.Instance.IsMyTurn || !e.isLocal && !TurnManager.Instance.IsMyTurn))
@@ -179,6 +185,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
             }
         }
     }
+    
     private void GameStatesManager_AnchorDownloaded(bool sucessful, GameObject objectToPlace)
     {
         if (sucessful)
@@ -232,7 +239,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         {
             isBoardCreated = true;
             Transform cameraTransform = CameraCache.Main.transform;
-            boardobject = Instantiate(BoardPrefab, GetPlacementPosition(cameraTransform.position, cameraTransform.forward, 1.0f), Quaternion.identity);
+            boardobject = Instantiate(BoardPrefab, GetPlacementPosition(cameraTransform.position + Vector3.up * 5, cameraTransform.forward, 1.0f), Quaternion.identity);
 
             boardobject.AddComponent<Interpolator>();
             boardobject.AddComponent<BoxCollider>();
@@ -246,7 +253,7 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
     {
         foreach (var item in gameObject.GetComponentsInChildren<Transform>())
         {
-            if (!item.name.Contains("Board") && !item.name.Contains("Cube") && !item.name.ToLower().Contains("line"))
+            if (!item.name.Contains("Board") && !item.name.Contains("Cube") && !item.name.ToLower().Contains("line") && !item.name.ToLower().Contains("button"))
             {
 
                 item.gameObject.AddComponent<BoxCollider>();
@@ -257,24 +264,58 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         }
     }
 
+    private void SetButtonScripts(GameObject gameObject)
+    {
+        var children = gameObject.GetComponentsInChildren<Transform>();
+        foreach (var item in gameObject.GetComponentsInChildren<Transform>())
+        {
+            if (item.name.ToLower().Contains("pass"))
+            {
+                item.gameObject.AddComponent<BoxCollider>();
+                item.name = "ButtonPass" + item.name;
+
+            }else if(item.name.ToLower().Contains("restart"))
+            {
+                item.gameObject.AddComponent<BoxCollider>();
+                item.name = "ButtonRestartGame" + item.name;
+            }
+        }
+
+    }
+
     /// <summary>
     /// Places a new Stone object ontop of a Zylinder
     /// </summary>
     /// <param name="zylinder">Zylinder to place to stone upon</param>
     public void SetStone(GameObject zylinder)
     {
-        GameObject stoneperfab = myStoneColor == StoneColor.Red ? RedStonePrefab : WhiteStonePrefab;
-        float offset = 0.01f;
-        SyncSpawnedObject syncSpawnedObject = null;
-        //syncSpawnedObject.GameObject = 
-        if (myStoneColor == StoneColor.Red)
-            syncSpawnedObject = new SyncStoneRed();
-        else
-            syncSpawnedObject = new SyncStoneWhite();
+        if (zylinder == null)
+            return;
+        if (!zylinder.name.Contains("Zylinder"))
+        {     
 
-        var newBoardPosition = boardobject.transform.InverseTransformPoint(zylinder.transform.position + new Vector3(0, offset, 0));
-        BoardSpawnManager.Spawn(syncSpawnedObject, newBoardPosition, zylinder.transform.rotation, boardobject, "Spielstein", true);
-        //zylinder.GetComponent<GameZylinder>().Stone = stone;
+            GameObject stoneperfab = myStoneColor == StoneColor.Red ? RedStonePrefab : WhiteStonePrefab;
+            float offset = 0.01f;
+            SyncSpawnedObject syncSpawnedObject = null;
+            if (myStoneColor == StoneColor.Red)
+                syncSpawnedObject = new SyncStoneRed();
+            else
+                syncSpawnedObject = new SyncStoneWhite();
+
+            var newBoardPosition = boardobject.transform.InverseTransformPoint(zylinder.transform.position + new Vector3(0, offset, 0));
+            BoardSpawnManager.Spawn(syncSpawnedObject, newBoardPosition, zylinder.transform.rotation, boardobject, "Spielstein", true);
+        }
+
+    }
+
+    public void PassOrRestartClicked(GameObject focusedButton)
+    {
+        if (focusedButton.name.Contains("Zylinder"))
+            return;
+
+
+
+
     }
 
     public void UpdateFocusedObject()
@@ -303,7 +344,6 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
         boardobject.GetComponent<Interpolator>().SetTargetRotation(Quaternion.Euler(0, cameraTransform.localEulerAngles.y, 0));
 
     }
-
 
     /// <summary>
     /// If we're using the spatial mapping, check to see if we got a hit, else use the gaze position.
@@ -413,7 +453,10 @@ public class GameStatesManager : MonoBehaviour, IInputClickHandler
                 break;
             case GameStates.Playing:
                 if (TurnManager.Instance.IsMyTurn)
+                {
                     SetStone(focusedObject);
+                }
+                PassOrRestartClicked(focusedObject);
                 break;
             default:
                 break;
