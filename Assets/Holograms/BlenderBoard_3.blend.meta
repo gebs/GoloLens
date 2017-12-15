@@ -106,6 +106,12 @@ ModelImporter:
     100196: LIne1_015
     100198: LIne1_016
     100200: LIne1_017
+    100202: Sphere
+    100204: Cylinder_001
+    100206: Cylinder_000
+    100208: ButtonGiveUp
+    100210: ButtonRestartGame
+    100212: ButtonPass
     400000: 11
     400002: 12
     400004: 13
@@ -207,6 +213,12 @@ ModelImporter:
     400196: LIne1_015
     400198: LIne1_016
     400200: LIne1_017
+    400202: Sphere
+    400204: Cylinder_001
+    400206: Cylinder_000
+    400208: ButtonGiveUp
+    400210: ButtonRestartGame
+    400212: ButtonPass
     2300000: 11
     2300002: 12
     2300004: 13
@@ -307,6 +319,12 @@ ModelImporter:
     2300194: LIne1_015
     2300196: LIne1_016
     2300198: LIne1_017
+    2300200: Sphere
+    2300202: Cylinder_001
+    2300204: Cylinder_000
+    2300206: ButtonGiveUp
+    2300208: ButtonRestartGame
+    2300210: ButtonPass
     3300000: 11
     3300002: 12
     3300004: 13
@@ -407,6 +425,12 @@ ModelImporter:
     3300194: LIne1_015
     3300196: LIne1_016
     3300198: LIne1_017
+    3300200: Sphere
+    3300202: Cylinder_001
+    3300204: Cylinder_000
+    3300206: ButtonGiveUp
+    3300208: ButtonRestartGame
+    3300210: ButtonPass
     4300000: LIne1_017
     4300002: LIne1_016
     4300004: LIne1_015
@@ -507,6 +531,12 @@ ModelImporter:
     4300194: 12
     4300196: 11
     4300198: Cube
+    4300200: Sphere
+    4300202: Cylinder_001
+    4300204: Cylinder_000
+    4300206: ButtonRestartGame
+    4300208: ButtonGiveUp
+    4300210: ButtonPass
     7400000: Default Take
     9500000: //RootNode
   materials:
