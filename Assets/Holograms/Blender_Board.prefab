@@ -1108,7 +1108,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4173624170293440}
   - component: {fileID: 114160780158326900}
-  - component: {fileID: 114513989676952060}
+  - component: {fileID: 114215229975314370}
   m_Layer: 0
   m_Name: Blender_Board
   m_TagString: Untagged
@@ -7073,7 +7073,7 @@ MonoBehaviour:
     i15: 191
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
---- !u!114 &114513989676952060
+--- !u!114 &114215229975314370
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -7081,7 +7081,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1626872755401626}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eaed9afecdc3e334ab1a1359edb65563, type: 3}
+  m_Script: {fileID: 11500000, guid: a0a8f29c438fc8948bff874e23d03348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   RedStonePrefab: {fileID: 1721933219366988, guid: d5522209e3b89c14887a741e92c51845,

@@ -8,23 +8,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[NetworkSettings(sendInterval = 0.033f)]
 public class BoardController : NetworkBehaviour, IInputClickHandler
 {
 
     public GameObject RedStonePrefab;
     public GameObject WhiteStonePrefab;
-
-    private Transform myTransform;
-    private float lerpRate = 0.3f;
-
-    [SyncVar] private GameStates2 gameState;
-    [SyncVar] private Vector3 syncPos;
-    [SyncVar] private Quaternion syncYRot;
-
-    private GameObject focusedObject;
-    private Vector3 lastPos;
-    private Quaternion lastRot;
 
     private static BoardController _Instance = null;
     /// <summary>
@@ -37,35 +25,97 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             return _Instance;
         }
     }
-    // Use this for initialization
-    void Start()
-    {
 
-        _Instance = this;
-        InputManager.Instance.PushModalInputHandler(gameObject);
-        transform.SetParent(SharedCollection.Instance.transform, false);
-        this.gameObject.AddComponent<Interpolator>();
-        this.gameObject.AddComponent<BoxCollider>();
-        SetZylinderScripts();
-        myTransform = transform;
-        this.gameState = GameStates2.PlaceBoard;
+
+    /// <summary>
+    /// The position relative to the shared world anchor.
+    /// </summary>
+    [SyncVar(hook = "xformchange")]
+    private Vector3 localPosition;
+
+    [SyncVar] private GameStates gameState;
+
+    private void xformchange(Vector3 update)
+    {
+        Debug.Log(localPosition + " xform change " + update);
+        localPosition = update;
     }
+
+    // <summary>
+    /// The rotation relative to the shared world anchor.
+    /// </summary>
+    [SyncVar]
+    private Quaternion localRotation;
+
+    /// <summary>
+    /// Sets the localPosition and localRotation on clients.
+    /// </summary>
+    /// <param name="postion">the localPosition to set</param>
+    /// <param name="rotation">the localRotation to set</param>
+    [Command]
+    public void CmdTransform(Vector3 postion, Quaternion rotation)
+    {
+        if (!isLocalPlayer)
+        {
+            localPosition = postion;
+            localRotation = rotation;
+        }
+    }
+
+    private bool Moving;
+    private int layerMask;
+    private InputManager inputManager;
+    public Vector3 movementOffset = Vector3.zero;
+    private GameObject focusedObject;
+
+    // Use this for initialization
+    private void Start()
+    {
+        transform.SetParent(SharedCollection.Instance.transform, true);
+        _Instance = this;
+        if (isServer)
+        {
+            localPosition = transform.localPosition;
+            localRotation = transform.localRotation;
+            Moving = true;
+        }
+
+        layerMask = SpatialMappingManager.Instance.LayerMask;
+        inputManager = InputManager.Instance;
+        inputManager.AddGlobalListener(gameObject);
+        SetZylinderScripts();
+        this.gameState = GameStates.PlaceBoard;
+
+    }
+
+    // Update is called once per frame
     private void Update()
     {
-        if (gameState == GameStates2.PlaceBoard)
+        if (gameState == GameStates.PlaceBoard)
         {
-            if (isServer)
+            if (Moving)
             {
-                PlaceObject();
-                TransmitMotion();
+                transform.position = Vector3.Lerp(transform.position, ProposeTransformPosition(), 0.2f);
+
+                // Depending on if you are host or client, either setting the SyncVar (host) 
+                // or calling the Cmd (client) will update the other users in the session.
+                // So we have to do both.
+                localPosition = transform.localPosition;
+                localRotation = transform.localRotation;
+                if (GoloLensPlayerController.Instance != null)
+                {
+                    GoloLensPlayerController.Instance.SendSharedTransform(gameObject, localPosition, localRotation);
+                }
             }
+            else
+            {
 
+                transform.localPosition = localPosition;
+                transform.localRotation = localRotation;
+            }
         }
-        else if (gameState == GameStates2.PlayingInit)
+        else if (gameState == GameStates.PlayingInit)
         {
-            if (isServer)
-                TransmitMotion();
-
             SpatialMappingManager.Instance.enabled = false;
             Destroy(this.gameObject.GetComponent<BoxCollider>());
             Destroy(SpatialMappingManager.Instance.gameObject);
@@ -73,113 +123,13 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             //The Server starts the Game
             TurnManager.Instance.IsMyTurn = isServer;
 
-            gameState = GameStates2.Playing;
+            gameState = GameStates.Playing;
         }
-        else if (gameState == GameStates2.Playing)
+        else if (gameState == GameStates.Playing)
         {
-            if (isServer)
-                TransmitMotion();
-
             UpdateFocusedObject();
         }
-
     }
-    public void UpdateFocusedObject()
-    {
-        GameObject oldfocusedObject = focusedObject;
-        Transform cameraTransform = CameraCache.Main.transform;
-        int layer = 1 << LayerMask.NameToLayer(this.name);
-        RaycastHit hitInfo;
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hitInfo))
-        {
-            focusedObject = hitInfo.collider.gameObject;
-        }
-        else
-        {
-            focusedObject = null;
-        }
-    }
-    private void PlaceObject()
-    {
-        if (!isServer) { return; }
-        Transform cameraTransform = CameraCache.Main.transform;
-        Vector3 placementPosition = GetPlacementPosition(cameraTransform.position, cameraTransform.forward, 1.0f);
-
-        // update the placement to match the user's gaze.
-        this.GetComponent<Interpolator>().SetTargetPosition(placementPosition);
-        // Rotate this object to face the user.
-        this.GetComponent<Interpolator>().SetTargetRotation(Quaternion.Euler(0, cameraTransform.localEulerAngles.y, 0));
-
-    }
-    /// <summary>
-    /// Get placement position either from GazeManager hit or infront of the user as backup
-    /// </summary>
-    /// <param name="headPosition">Position of the users head</param>
-    /// <param name="gazeDirection">Gaze direction of the user</param>
-    /// <param name="defaultGazeDistance">Default placement distance infront of the user</param>
-    /// <returns>Placement position infront of the user</returns>
-    private static Vector3 GetGazePlacementPosition(Vector3 headPosition, Vector3 gazeDirection, float defaultGazeDistance)
-    {
-        if (GazeManager.Instance.HitObject != null)
-        {
-            return GazeManager.Instance.HitPosition;
-        }
-        return headPosition + gazeDirection * defaultGazeDistance;
-    }
-    /// <summary>
-    /// If we're using the spatial mapping, check to see if we got a hit, else use the gaze position.
-    /// </summary>
-    /// <returns>Placement position infront of the user</returns>
-    private static Vector3 GetPlacementPosition(Vector3 headPosition, Vector3 gazeDirection, float defaultGazeDistance)
-    {
-        RaycastHit hitInfo;
-        if (SpatialMappingRaycast(headPosition, gazeDirection, out hitInfo))
-        {
-            return hitInfo.point;
-        }
-        return GetGazePlacementPosition(headPosition, gazeDirection, defaultGazeDistance);
-    }
-    /// <summary>
-    /// Does a raycast on the spatial mapping layer to try to find a hit.
-    /// </summary>
-    /// <param name="origin">Origin of the raycast</param>
-    /// <param name="direction">Direction of the raycast</param>
-    /// <param name="spatialMapHit">Result of the raycast when a hit occured</param>
-    /// <returns>Wheter it found a hit or not</returns>
-    private static bool SpatialMappingRaycast(Vector3 origin, Vector3 direction, out RaycastHit spatialMapHit)
-    {
-        if (SpatialMappingManager.Instance != null)
-        {
-            RaycastHit hitInfo;
-            if (Physics.Raycast(origin, direction, out hitInfo, 30.0f, SpatialMappingManager.Instance.LayerMask))
-            {
-                spatialMapHit = hitInfo;
-                return true;
-            }
-        }
-        spatialMapHit = new RaycastHit();
-        return false;
-    }
-    void TransmitMotion()
-    {
-        if (!isServer)
-        {
-            return;
-        }
-
-        //Transform情報更新(キャッシュされたTransformから取得するほうが早い)
-        lastPos = myTransform.position;
-        lastRot = myTransform.rotation;
-
-        
-        //SyncVar変数を変更し、全クライアントと同期を図る
-        syncPos = SharedCollection.Instance.transform.InverseTransformPoint(myTransform.position); 
-        //localEulerAngles: Quaternion→オイラー角(360度表記)
-        syncYRot = myTransform.rotation;
-
-    }
-    //現在のTransform情報とSyncVar情報とを補間する
-
     /// <summary>
     /// Sets the neccessary Scripts on all Zylinder of the Board
     /// </summary>
@@ -198,6 +148,22 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             }
         }
     }
+    public void UpdateFocusedObject()
+    {
+        GameObject oldfocusedObject = focusedObject;
+        Transform cameraTransform = CameraCache.Main.transform;
+        int layer = 1 << LayerMask.NameToLayer(this.name);
+        RaycastHit hitInfo;
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hitInfo))
+        {
+            focusedObject = hitInfo.collider.gameObject;
+        }
+        else
+        {
+            focusedObject = null;
+        }
+    }
+
     /// <summary>
     /// Places a new Stone object ontop of a Zylinder
     /// </summary>
@@ -215,16 +181,39 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             && ((zylinder.GetComponent<GameZylinder>().StoneColor == StoneColor.Red && isServer)
             || (zylinder.GetComponent<GameZylinder>().StoneColor == StoneColor.White && isClient)))
         {
-            CmdDeleteStone(zylinder.GetComponent<GameZylinder>().Position.Row, zylinder.GetComponent<GameZylinder>().Position.Column);
+            if (!isServer)
+                CmdDeleteStone(zylinder.GetComponent<GameZylinder>().Position.Row, zylinder.GetComponent<GameZylinder>().Position.Column);
+            else
+                RpcDeleteStone(zylinder.GetComponent<GameZylinder>().Position.Row, zylinder.GetComponent<GameZylinder>().Position.Column);
         }
     }
+
     [Command]
     private void CmdDeleteStone(int row, int column)
+    {
+        RpcDeleteStone(row, column);
+    }
+
+    [ClientRpc]
+    private void RpcDeleteStone(int row, int column)
     {
         GameObject stone = FindZylinderByPosition(row, column);
         if (stone != null)
             Destroy(stone);
     }
+
+    [Command]
+    private void CmdChangeState(int state)
+    {
+        RpcChangeState(state);
+    }
+
+    [ClientRpc]
+    private void RpcChangeState(int state)
+    {
+        gameState = (GameStates)Enum.ToObject(typeof(GameStates), state);
+    }
+
 
     private GameObject FindZylinderByPosition(int row, int column)
     {
@@ -238,19 +227,51 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
         }
         return null;
     }
+
+    private Vector3 ProposeTransformPosition()
+    {
+        // Put the model 3m in front of the user.
+        Vector3 retval = Camera.main.transform.position + Camera.main.transform.forward * 3 + movementOffset;
+        RaycastHit hitInfo;
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hitInfo, 5.0f, layerMask))
+        {
+            retval = hitInfo.point + movementOffset;
+        }
+        return retval;
+    }
+
     public void OnInputClicked(InputClickedEventData eventData)
     {
-        switch (gameState)
+        if (gameState == GameStates.PlaceBoard && isServer)
         {
+            Moving = !Moving;
+            if (Moving)
+            {
+                //inputManager.AddGlobalListener(gameObject);
+                if (SpatialMappingManager.Instance != null)
+                {
+                    SpatialMappingManager.Instance.DrawVisualMeshes = true;
+                }
+            }
+            else
+            {
+               // inputManager.RemoveGlobalListener(gameObject);
+                if (SpatialMappingManager.Instance != null)
+                {
+                    SpatialMappingManager.Instance.DrawVisualMeshes = false;
+                }
 
-            case GameStates2.PlaceBoard:
-                gameState = GameStates2.PlayingInit;
-                break;
-            case GameStates2.Playing:
-                SetStone(focusedObject);
-                break;
-            default:
-                break;
+            }
+            CmdChangeState((int)GameStates.PlayingInit);
         }
+        else if (gameState == GameStates.Playing)
+        {
+            SetStone(focusedObject);
+        }
+
+
+
+        eventData.Use();
+
     }
 }

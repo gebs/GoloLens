@@ -368,17 +368,12 @@
     <Compile Include="Assets\HoloToolkit\UX\Scripts\SymbolKeyboard.cs" />
     <Compile Include="Assets\HoloToolkit\UX\Scripts\UICollection.cs" />
     <Compile Include="Assets\Scripts\BoardController.cs" />
-    <Compile Include="Assets\Scripts\BoardController2.cs" />
-    <Compile Include="Assets\Scripts\GameStateManager2.cs" />
+    <Compile Include="Assets\Scripts\GameStateManager.cs" />
     <Compile Include="Assets\Scripts\GameStates.cs" />
-    <Compile Include="Assets\Scripts\GameStates2.cs" />
-    <Compile Include="Assets\Scripts\GameStatesManager.cs" />
     <Compile Include="Assets\Scripts\GameZylinder.cs" />
-    <Compile Include="Assets\Scripts\GoloLensPerfabSpawnManager.cs" />
     <Compile Include="Assets\Scripts\GoloLensPlayerController.cs" />
     <Compile Include="Assets\Scripts\StoneColor.cs" />
     <Compile Include="Assets\Scripts\StoneController.cs" />
-    <Compile Include="Assets\Scripts\SyncGameBoard.cs" />
     <Compile Include="Assets\Scripts\TurnManager.cs" />
     <Compile Include="Assets\Scripts\ZylinderPosition.cs" />
   </ItemGroup>

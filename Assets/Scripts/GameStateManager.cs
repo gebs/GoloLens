@@ -7,13 +7,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class GameStateManager2 : MonoBehaviour, IInputClickHandler
+public class GameStateManager : MonoBehaviour, IInputClickHandler
 {
     public GameObject BoardPrefab;
     public GameObject UserInfoTextPrefab;
 
     private NetworkDiscoveryWithAnchors networkDiscovery;
-    private GameStates2 gameState;
+    private GameStates gameState;
     private bool isPlayer1 = false;
     private GameObject boardobject;
     private GameObject userInfoObject;
@@ -21,7 +21,7 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
     // Use this for initialization
     void Start()
     {
-        gameState = GameStates2.BeforeGameStartsInit;
+        gameState = GameStates.BeforeGameStartsInit;
         networkDiscovery = NetworkDiscoveryWithAnchors.Instance;
     }
 
@@ -30,35 +30,35 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
     {
         switch (gameState)
         {
-            case GameStates2.BeforeGameStartsInit:
+            case GameStates.BeforeGameStartsInit:
                 networkDiscovery.ConnectionStatusChanged += Instance_ConnectionStatusChanged;
-                gameState = GameStates2.BeforeGameStarts;
+                gameState = GameStates.BeforeGameStarts;
                 break;
-            case GameStates2.BeforeGameStarts:
+            case GameStates.BeforeGameStarts:
                // userInfoObject = Instantiate(UserInfoTextPrefab, GetPlacementPosition(CameraCache.Main.transform.position, CameraCache.Main.transform.forward, 2.0f), Quaternion.identity);
                 //userInfoObject.GetComponent<TextMesh>().text = "Please wait for the Anchor to be downloaded...";
                 break;
-            case GameStates2.WaitingForAnchorsInit:
-                gameState = GameStates2.WaitingForAnchors;
+            case GameStates.WaitingForAnchorsInit:
+                gameState = GameStates.WaitingForAnchors;
                // userInfoObject.SetActive(false);
                 break;
-            case GameStates2.WaitingForAnchors:
+            case GameStates.WaitingForAnchors:
                 if (UNetAnchorManager.Instance != null && UNetAnchorManager.Instance.AnchorEstablished)
                 {
                     if (isPlayer1)
-                        gameState = GameStates2.PlaceBoardInit;
+                        gameState = GameStates.PlaceBoardInit;
                     else
-                        gameState = GameStates2.WaitingForBoardPlacementInit;
+                        gameState = GameStates.WaitingForBoardPlacementInit;
                 }
                 break;
-            case GameStates2.PlaceBoardInit:
+            case GameStates.PlaceBoardInit:
                 CreateGameObject();
                 ToggleSpatialMesh();
-                gameState = GameStates2.PlaceBoard;
+                gameState = GameStates.PlaceBoard;
                 break;
-            case GameStates2.WaitingForBoardPlacementInit:
+            case GameStates.WaitingForBoardPlacementInit:
                 //userInfoObject.GetComponent<TextMesh>().text = "Please wait until the other user has placed the board...";
-                gameState = GameStates2.WaitingForBoardPlacement;
+                gameState = GameStates.WaitingForBoardPlacement;
                 break;
             default:
                 break;
@@ -129,7 +129,7 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
     {
         if (SpatialMappingManager.Instance != null)
         {
-            SpatialMappingManager.Instance.DrawVisualMeshes = gameState == GameStates2.PlaceBoard || gameState == GameStates2.PlaceBoardInit;
+            SpatialMappingManager.Instance.DrawVisualMeshes = gameState == GameStates.PlaceBoard || gameState == GameStates.PlaceBoardInit;
         }
     }
     private void Instance_ConnectionStatusChanged(object sender, System.EventArgs e)
@@ -146,7 +146,7 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
 
             }
             Debug.Log("IsConnected");
-            gameState = GameStates2.WaitingForAnchorsInit;
+            gameState = GameStates.WaitingForAnchorsInit;
             networkDiscovery.ConnectionStatusChanged -= Instance_ConnectionStatusChanged;
         }
 
@@ -157,7 +157,7 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
         Debug.Log("OnInputClicked");
         switch (gameState)
         {
-            case GameStates2.PlaceBoard:
+            case GameStates.PlaceBoard:
                 break;
             default:
                 break;

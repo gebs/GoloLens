@@ -324,7 +324,7 @@ public class GoloLensPlayerController : NetworkBehaviour
     [Command]
     private void CmdSendSharedTransform(GameObject target, Vector3 pos, Quaternion rot)
     {
-        BoardController2 ush = target.GetComponent<BoardController2>();
+        BoardController ush = target.GetComponent<BoardController>();
         ush.CmdTransform(pos, rot);
     }
 
