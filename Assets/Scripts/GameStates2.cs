@@ -4,9 +4,9 @@ using UnityEngine;
 
 public enum GameStates2
 {
-    BeforeGameStartsInit,
-    BeforeGameStarts,
-    WaitingForAnchorsInit,
+    BeforeGameStartsInit = 0,
+    BeforeGameStarts = 1,
+    WaitingForAnchorsInit = 2,
     WaitingForAnchors,
     PlaceBoardInit,
     PlaceBoard,

@@ -69,7 +69,7 @@ public class GameStateManager2 : MonoBehaviour, IInputClickHandler
         Transform cameraTransform = CameraCache.Main.transform;
         boardobject = Instantiate(BoardPrefab, SharedCollection.Instance.transform.InverseTransformPoint(GetPlacementPosition(cameraTransform.position, cameraTransform.forward, 1.0f)), Quaternion.identity);
 
-        NetworkServer.Spawn(boardobject);
+        NetworkServer.SpawnWithClientAuthority(boardobject,GoloLensPlayerController.Instance.gameObject);
     }
     /// <summary>
     /// If we're using the spatial mapping, check to see if we got a hit, else use the gaze position.

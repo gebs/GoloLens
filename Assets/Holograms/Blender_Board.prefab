@@ -1108,8 +1108,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4173624170293440}
   - component: {fileID: 114160780158326900}
-  - component: {fileID: 114635742503661542}
-  - component: {fileID: 114820368391334178}
+  - component: {fileID: 114513989676952060}
   m_Layer: 0
   m_Name: Blender_Board
   m_TagString: Untagged
@@ -7073,8 +7072,8 @@ MonoBehaviour:
     i14: 220
     i15: 191
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
---- !u!114 &114635742503661542
+  m_LocalPlayerAuthority: 1
+--- !u!114 &114513989676952060
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -7082,31 +7081,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1626872755401626}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1768714887, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_TransformSyncMode: 1
-  m_SendInterval: 1
-  m_SyncRotationAxis: 7
-  m_RotationSyncCompression: 0
-  m_SyncSpin: 0
-  m_MovementTheshold: 0.001
-  m_VelocityThreshold: 0.0001
-  m_SnapThreshold: 5
-  m_InterpolateRotation: 1
-  m_InterpolateMovement: 1
---- !u!114 &114820368391334178
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1626872755401626}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0a8f29c438fc8948bff874e23d03348, type: 3}
+  m_Script: {fileID: 11500000, guid: eaed9afecdc3e334ab1a1359edb65563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   RedStonePrefab: {fileID: 1721933219366988, guid: d5522209e3b89c14887a741e92c51845,
     type: 2}
   WhiteStonePrefab: {fileID: 1511029638082886, guid: ad660fd170a14f54a80716dd34a9b025,
     type: 2}
+  movementOffset: {x: 0, y: 0, z: 0}
