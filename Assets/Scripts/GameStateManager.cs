@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class GameStateManager : MonoBehaviour, IInputClickHandler
+public class GameStateManager : Singleton<GameStateManager>, IInputClickHandler
 {
     public GameObject BoardPrefab;
     public GameObject UserInfoTextPrefab;
@@ -35,34 +35,39 @@ public class GameStateManager : MonoBehaviour, IInputClickHandler
                 gameState = GameStates.BeforeGameStarts;
                 break;
             case GameStates.BeforeGameStarts:
-               // userInfoObject = Instantiate(UserInfoTextPrefab, GetPlacementPosition(CameraCache.Main.transform.position, CameraCache.Main.transform.forward, 2.0f), Quaternion.identity);
-                //userInfoObject.GetComponent<TextMesh>().text = "Please wait for the Anchor to be downloaded...";
                 break;
             case GameStates.WaitingForAnchorsInit:
+                userInfoObject = Instantiate(UserInfoTextPrefab, GetPlacementPosition(CameraCache.Main.transform.position, CameraCache.Main.transform.forward, 2.0f), Quaternion.identity);
+                userInfoObject.GetComponent<TextMesh>().text = "Please wait for the Anchor to be downloaded...";
                 gameState = GameStates.WaitingForAnchors;
-               // userInfoObject.SetActive(false);
                 break;
             case GameStates.WaitingForAnchors:
                 if (UNetAnchorManager.Instance != null && UNetAnchorManager.Instance.AnchorEstablished)
                 {
                     if (isPlayer1)
+                    {
                         gameState = GameStates.PlaceBoardInit;
+                    }
                     else
                         gameState = GameStates.WaitingForBoardPlacementInit;
                 }
                 break;
             case GameStates.PlaceBoardInit:
+                userInfoObject.SetActive(false);
                 CreateGameObject();
                 ToggleSpatialMesh();
                 gameState = GameStates.PlaceBoard;
                 break;
             case GameStates.WaitingForBoardPlacementInit:
-                //userInfoObject.GetComponent<TextMesh>().text = "Please wait until the other user has placed the board...";
+                userInfoObject.GetComponent<TextMesh>().text = "Please wait until the other user has placed the board...";
                 gameState = GameStates.WaitingForBoardPlacement;
                 break;
             default:
                 break;
         }
+    }
+    public void DestoryInfo() {
+        Destroy(userInfoObject);
     }
     private void CreateGameObject()
     {

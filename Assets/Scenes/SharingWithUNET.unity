@@ -20,11 +20,11 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 4
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
@@ -407,6 +407,7 @@ GameObject:
   - component: {fileID: 1313998487}
   - component: {fileID: 1313998490}
   - component: {fileID: 1313998491}
+  - component: {fileID: 1313998492}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -468,10 +469,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3e92fb3af8999a4781fe6ec3ef9ea5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BoardPrefab: {fileID: 1626872755401626, guid: b30ca2c07cdccaf49afbecf2cb55dcbf,
-    type: 2}
-  UserInfoTextPrefab: {fileID: 1041074053728542, guid: 77746223e43b56941a658990b6f43c5a,
-    type: 2}
 --- !u!114 &1313998491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -487,6 +484,17 @@ MonoBehaviour:
     type: 2}
   UserInfoTextPrefab: {fileID: 1041074053728542, guid: 77746223e43b56941a658990b6f43c5a,
     type: 2}
+--- !u!114 &1313998492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1313998486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ad2172754bbf774fb3110137a463fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1690207753
 GameObject:
   m_ObjectHideFlags: 0

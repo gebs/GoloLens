@@ -82,7 +82,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
 
         layerMask = SpatialMappingManager.Instance.LayerMask;
         inputManager = InputManager.Instance;
-      //  inputManager.AddGlobalListener(gameObject);
+        //  inputManager.AddGlobalListener(gameObject);
         SetZylinderScripts();
         this.gameState = GameStates.PlaceBoard;
 
@@ -119,6 +119,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             SpatialMappingManager.Instance.enabled = false;
             Destroy(this.gameObject.GetComponent<BoxCollider>());
             Destroy(SpatialMappingManager.Instance.gameObject);
+            GameStateManager.Instance.DestoryInfo();
 
             //The Server starts the Game
             TurnManager.Instance.IsMyTurn = isServer;
@@ -138,13 +139,17 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
     {
         foreach (var item in this.GetComponentsInChildren<Transform>())
         {
-            if (!item.name.Contains("Board") && !item.name.Contains("Cube") && !item.name.ToLower().Contains("line"))
+            if (!item.name.Contains("Board") && !item.name.Contains("Cube") && !item.name.ToLower().Contains("line") && !item.name.Contains("Button"))
             {
 
                 item.gameObject.AddComponent<BoxCollider>();
                 item.gameObject.AddComponent<GameZylinder>();
                 item.gameObject.GetComponent<GameZylinder>().Position = new ZylinderPosition() { Row = Convert.ToInt32(item.gameObject.name[0]), Column = Convert.ToInt32(item.gameObject.name[1]) };
                 item.name = "Zylinder_" + item.name;
+            }
+            else if (item.name.Contains("Button"))
+            {
+                item.gameObject.AddComponent<BoxCollider>();
             }
         }
     }
@@ -188,20 +193,6 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
         }
     }
 
-    /*   [Command]
-       private void CmdDeleteStone(int row, int column)
-       {
-           RpcDeleteStone(row, column);
-       }
-
-       [ClientRpc]
-       private void RpcDeleteStone(int row, int column)
-       {
-           GameObject stone = FindZylinderByPosition(row, column);
-           if (stone != null)
-               Destroy(stone);
-       }
-       */
     [Command]
     private void CmdChangeState(int state)
     {
@@ -228,6 +219,20 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
         return null;
     }
 
+    public List<ZylinderPosition> FindZylinderWithStone()
+    {
+        List<ZylinderPosition> pos = new List<ZylinderPosition>();
+        foreach (var item in this.GetComponentsInChildren<Transform>())
+        {
+            if (item.name.Contains("Zylinder"))
+            {
+                if (item.gameObject.GetComponent<GameZylinder>().HasStoneSet())
+                    pos.Add(item.gameObject.GetComponent<GameZylinder>().Position);
+            }
+        }
+        return pos;
+    }
+
     private Vector3 ProposeTransformPosition()
     {
         // Put the model 3m in front of the user.
@@ -247,7 +252,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             Moving = !Moving;
             if (Moving)
             {
-              
+
                 if (SpatialMappingManager.Instance != null)
                 {
                     SpatialMappingManager.Instance.DrawVisualMeshes = true;
@@ -255,7 +260,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             }
             else
             {
-               
+
                 if (SpatialMappingManager.Instance != null)
                 {
                     SpatialMappingManager.Instance.DrawVisualMeshes = false;
@@ -266,7 +271,22 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
         }
         else if (gameState == GameStates.Playing)
         {
-            SetStone(focusedObject);
+            if (focusedObject.name.Contains("Zylinder"))
+                SetStone(focusedObject);
+            else if (TurnManager.Instance.IsMyTurn && focusedObject.name.Contains("ButtonPass"))
+            {
+                GoloLensPlayerController.Instance.Pass();
+            }
+            else if (focusedObject.name.Contains("ButtonRestartGame"))
+            {
+                foreach (var item in FindZylinderWithStone())
+                {
+                    if (!isServer)
+                        GoloLensPlayerController.Instance.DeleteStone(item.Row, item.Column);
+                    else
+                        GoloLensPlayerController.Instance.DeleteStoneRpc(item.Row, item.Column);
+                }
+            }
         }
 
 

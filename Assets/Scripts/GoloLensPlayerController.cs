@@ -339,6 +339,26 @@ public class GoloLensPlayerController : NetworkBehaviour
         RpcDeleteStone(row, column);
     }
 
+    [Command]
+    private void CmdPass()
+    {
+        RpcPass();
+    }
+
+    [ClientRpc]
+    private void RpcPass()
+    {
+        TurnManager.Instance.ChangeCurrentTurn();
+    }
+
+    public void Pass()
+    {
+        if (isServer)
+            RpcPass();
+        else
+            CmdPass();
+    }
+
     [ClientRpc]
     private void RpcDeleteStone(int row, int column)
     {
