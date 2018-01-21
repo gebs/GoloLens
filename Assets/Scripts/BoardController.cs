@@ -11,8 +11,8 @@ using UnityEngine.Networking;
 public class BoardController : NetworkBehaviour, IInputClickHandler
 {
 
-    public GameObject RedStonePrefab;
-    public GameObject WhiteStonePrefab;
+    [SerializeField] public GameObject RedStonePrefab;
+    [SerializeField] public GameObject WhiteStonePrefab;
 
     private static BoardController _Instance = null;
     /// <summary>
@@ -33,7 +33,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
     [SyncVar(hook = "xformchange")]
     private Vector3 localPosition;
 
-    [SyncVar] private GameStates gameState;
+    private GameStates gameState;
 
     private void xformchange(Vector3 update)
     {
@@ -82,7 +82,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
 
         layerMask = SpatialMappingManager.Instance.LayerMask;
         inputManager = InputManager.Instance;
-        inputManager.AddGlobalListener(gameObject);
+      //  inputManager.AddGlobalListener(gameObject);
         SetZylinderScripts();
         this.gameState = GameStates.PlaceBoard;
 
@@ -170,38 +170,38 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
     /// <param name="zylinder">Zylinder to place to stone upon</param>
     public void SetStone(GameObject zylinder)
     {
-        if (!zylinder.GetComponent<GameZylinder>().HasStoneSet() && (TurnManager.Instance.IsMyTurn || true))
+        if (!zylinder.GetComponent<GameZylinder>().HasStoneSet() && (TurnManager.Instance.IsMyTurn))
         {
-            GameObject stoneperfab = isServer ? RedStonePrefab : WhiteStonePrefab;
             float offset = 0.01f;
-            var stone = Instantiate(stoneperfab, SharedCollection.Instance.transform.InverseTransformPoint(zylinder.transform.position + new Vector3(0, offset, 0)), zylinder.transform.rotation);
-            NetworkServer.Spawn(stone);
+            GoloLensPlayerController.Instance.SpawnStone(isServer, SharedCollection.Instance.transform.InverseTransformPoint(zylinder.transform.position + new Vector3(0, offset, 0)), zylinder.transform.rotation);
         }
         else if (zylinder.GetComponent<GameZylinder>().HasStoneSet()
             && ((zylinder.GetComponent<GameZylinder>().StoneColor == StoneColor.Red && isServer)
             || (zylinder.GetComponent<GameZylinder>().StoneColor == StoneColor.White && isClient)))
         {
+            GameZylinder gz = zylinder.GetComponent<GameZylinder>();
+
             if (!isServer)
-                CmdDeleteStone(zylinder.GetComponent<GameZylinder>().Position.Row, zylinder.GetComponent<GameZylinder>().Position.Column);
+                GoloLensPlayerController.Instance.DeleteStone(gz.Position.Row, gz.Position.Column);
             else
-                RpcDeleteStone(zylinder.GetComponent<GameZylinder>().Position.Row, zylinder.GetComponent<GameZylinder>().Position.Column);
+                GoloLensPlayerController.Instance.DeleteStoneRpc(gz.Position.Row, gz.Position.Column);
         }
     }
 
-    [Command]
-    private void CmdDeleteStone(int row, int column)
-    {
-        RpcDeleteStone(row, column);
-    }
+    /*   [Command]
+       private void CmdDeleteStone(int row, int column)
+       {
+           RpcDeleteStone(row, column);
+       }
 
-    [ClientRpc]
-    private void RpcDeleteStone(int row, int column)
-    {
-        GameObject stone = FindZylinderByPosition(row, column);
-        if (stone != null)
-            Destroy(stone);
-    }
-
+       [ClientRpc]
+       private void RpcDeleteStone(int row, int column)
+       {
+           GameObject stone = FindZylinderByPosition(row, column);
+           if (stone != null)
+               Destroy(stone);
+       }
+       */
     [Command]
     private void CmdChangeState(int state)
     {
@@ -215,7 +215,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
     }
 
 
-    private GameObject FindZylinderByPosition(int row, int column)
+    public GameObject FindZylinderByPosition(int row, int column)
     {
         foreach (var item in this.GetComponentsInChildren<Transform>())
         {
@@ -247,7 +247,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             Moving = !Moving;
             if (Moving)
             {
-                //inputManager.AddGlobalListener(gameObject);
+              
                 if (SpatialMappingManager.Instance != null)
                 {
                     SpatialMappingManager.Instance.DrawVisualMeshes = true;
@@ -255,7 +255,7 @@ public class BoardController : NetworkBehaviour, IInputClickHandler
             }
             else
             {
-               // inputManager.RemoveGlobalListener(gameObject);
+               
                 if (SpatialMappingManager.Instance != null)
                 {
                     SpatialMappingManager.Instance.DrawVisualMeshes = false;

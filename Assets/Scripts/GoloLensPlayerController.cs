@@ -313,6 +313,40 @@ public class GoloLensPlayerController : NetworkBehaviour
            // Clean up the bullet in 8 seconds.
            Destroy(nextBullet, 8.0f);*/
     }
+    [Command]
+    void CmdSpawnStone(bool red, Vector3 pos, Quaternion rot)
+    {
+        GameObject stoneperfab = red ? BoardController.Instance.RedStonePrefab : BoardController.Instance.WhiteStonePrefab;
+        var stone = Instantiate(stoneperfab, pos, rot);
+        NetworkServer.Spawn(stone);
+    }
+    public void SpawnStone(bool red, Vector3 pos, Quaternion rot)
+    {
+        CmdSpawnStone(red, pos, rot);
+    }
+    public void DeleteStone(int row, int column)
+    {
+        CmdDeleteStone(row, column);
+    }
+    [Command]
+    private void CmdDeleteStone(int row, int column)
+    {
+        RpcDeleteStone(row, column);
+    }
+
+    public void DeleteStoneRpc(int row, int column)
+    {
+        RpcDeleteStone(row, column);
+    }
+
+    [ClientRpc]
+    private void RpcDeleteStone(int row, int column)
+    {
+        GameObject stone = BoardController.Instance.FindZylinderByPosition(row, column);
+        if (stone != null)
+            Destroy(stone);
+    }
+
     public void OnInputClicked(InputClickedEventData eventData)
     {
         if (isLocalPlayer)

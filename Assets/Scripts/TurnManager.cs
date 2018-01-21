@@ -3,20 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurnManager : MonoBehaviour
+public class TurnManager : Singleton<TurnManager>
 {
-    private static TurnManager instance;
-
-    public static TurnManager Instance
-    {
-        get
-        {
-            if (instance == null)
-                return instance = new TurnManager();
-            else
-                return instance;
-        }
-    }
     private TurnManager()
     {
 
